@@ -1,4 +1,4 @@
-import { memo, useLayoutEffect, useMemo, useRef } from 'react';
+import { memo, useMemo, useRef } from 'react';
 import { useFrame, type ThreeEvent } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import {
@@ -9,10 +9,10 @@ import {
   MeshBasicMaterial,
   MeshStandardMaterial,
   type Group,
-  type Material,
   type Mesh,
 } from 'three';
 import { useObjectStore } from '../../stores/objectStore';
+import { useDisposableRef } from '../../hooks/useDisposableRef';
 import { getClassInfo } from '../detection/classCatalog';
 import { clamp, dampFactor, lerpAngle } from '../../utils/math';
 import { fmtDistance } from '../../utils/format';
@@ -260,16 +260,3 @@ export const ObjectMesh = memo(function ObjectMesh({
     </group>
   );
 });
-
-/**
- * 재질을 ref 로 노출하고, 테마 변경으로 교체되거나 언마운트되면 GPU 자원을 해제합니다.
- * (레이아웃 효과: 화면에 그려지기 전에 ref 를 새 재질로 바꿔 한 프레임도 이전 재질을 갱신하지 않음)
- */
-function useDisposableRef<T extends Material>(material: T) {
-  const ref = useRef(material);
-  useLayoutEffect(() => {
-    ref.current = material;
-    return () => material.dispose();
-  }, [material]);
-  return ref;
-}

@@ -10,6 +10,9 @@ export async function initSettings(): Promise<void> {
     if (typeof s.modelId === 'string' && MODEL_REGISTRY.some((m) => m.id === s.modelId)) ui.setModelId(s.modelId);
     if (typeof s.preferredDeviceId === 'string') ui.setPreferredDeviceId(s.preferredDeviceId);
     if (s.fitMode === 'contain' || s.fitMode === 'cover') ui.setFitMode(s.fitMode as FitMode);
+    if (typeof s.proximityAlertEnabled === 'boolean') ui.setProximityAlertEnabled(s.proximityAlertEnabled);
+    if (typeof s.proximityAlertDistance === 'number' && Number.isFinite(s.proximityAlertDistance))
+      ui.setProximityAlertDistance(s.proximityAlertDistance);
   } catch {
     // 저장소 사용 불가: 기본값 사용
   }
@@ -18,5 +21,9 @@ export async function initSettings(): Promise<void> {
     if (st.preferredDeviceId !== prev.preferredDeviceId)
       void calibrationStorage.putSetting('preferredDeviceId', st.preferredDeviceId).catch(() => undefined);
     if (st.fitMode !== prev.fitMode) void calibrationStorage.putSetting('fitMode', st.fitMode).catch(() => undefined);
+    if (st.proximityAlertEnabled !== prev.proximityAlertEnabled)
+      void calibrationStorage.putSetting('proximityAlertEnabled', st.proximityAlertEnabled).catch(() => undefined);
+    if (st.proximityAlertDistance !== prev.proximityAlertDistance)
+      void calibrationStorage.putSetting('proximityAlertDistance', st.proximityAlertDistance).catch(() => undefined);
   });
 }

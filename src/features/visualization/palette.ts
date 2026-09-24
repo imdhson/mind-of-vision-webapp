@@ -8,6 +8,7 @@ export interface ScenePalette {
   gridCell: string;
   gridSection: string;
   distanceRing: string;
+  trail: string;
   user: string;
   userRing: string;
   fov: string;
@@ -24,6 +25,7 @@ export const DARK_PALETTE: ScenePalette = {
   gridCell: '#18181b',
   gridSection: '#222226',
   distanceRing: '#26262b',
+  trail: '#6b6b73',
   user: '#ffffff',
   userRing: '#ffffff',
   fov: '#ffffff',
@@ -40,6 +42,7 @@ export const LIGHT_PALETTE: ScenePalette = {
   gridCell: '#e7e7ea',
   gridSection: '#dcdce0',
   distanceRing: '#d6d6db',
+  trail: '#9a9aa2',
   user: '#0a0a0b',
   userRing: '#0a0a0b',
   fov: '#0a0a0b',
