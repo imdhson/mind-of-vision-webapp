@@ -1,4 +1,4 @@
-import { memo, useMemo, useRef } from 'react';
+import { memo, useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame, type ThreeEvent } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import {
@@ -9,6 +9,7 @@ import {
   MeshBasicMaterial,
   MeshStandardMaterial,
   type Group,
+  type Material,
   type Mesh,
 } from 'three';
 import { useObjectStore } from '../../stores/objectStore';
@@ -92,6 +93,11 @@ export const ObjectMesh = memo(function ObjectMesh({
     [],
   );
   const tmpColor = useMemo(() => new Color(), []);
+  // 매 프레임 바꾸는 재질은 ref 로 접근(렌더 중 만든 값을 직접 변경하지 않음)
+  const materialRef = useDisposableRef(material);
+  const ringMatRef = useDisposableRef(ringMat);
+  useDisposableRef(arrowMat);
+  useDisposableRef(hitMat);
 
   useFrame((_, delta) => {
     const g = root.current;
@@ -164,15 +170,17 @@ export const ObjectMesh = memo(function ObjectMesh({
             ? 0.6
             : 1;
     s.opacity += (targetOpacity - s.opacity) * dampFactor(dt, 0.2);
-    material.opacity = s.opacity;
-    material.color.lerp(tmpColor.set(selected ? palette.selected : palette.object), dampFactor(dt, 0.12));
-    material.emissive.set(selected ? palette.selectedEmissive : '#000000');
+    const mat = materialRef.current;
+    mat.opacity = s.opacity;
+    mat.color.lerp(tmpColor.set(selected ? palette.selected : palette.object), dampFactor(dt, 0.12));
+    mat.emissive.set(selected ? palette.selectedEmissive : '#000000');
 
     if (ring.current) {
       const r = Math.max(0.16, Math.max(s.sx, s.sz) * 0.6);
       ring.current.scale.set(r, r, r);
-      ringMat.color.set(selected ? palette.selected : palette.ring);
-      ringMat.opacity = (selected ? 0.95 : 0.45) * s.opacity;
+      const rm = ringMatRef.current;
+      rm.color.set(selected ? palette.selected : palette.ring);
+      rm.opacity = (selected ? 0.95 : 0.45) * s.opacity;
     }
 
     if (facing.current) {
@@ -252,3 +260,16 @@ export const ObjectMesh = memo(function ObjectMesh({
     </group>
   );
 });
+
+/**
+ * 재질을 ref 로 노출하고, 테마 변경으로 교체되거나 언마운트되면 GPU 자원을 해제합니다.
+ * (레이아웃 효과: 화면에 그려지기 전에 ref 를 새 재질로 바꿔 한 프레임도 이전 재질을 갱신하지 않음)
+ */
+function useDisposableRef<T extends Material>(material: T) {
+  const ref = useRef(material);
+  useLayoutEffect(() => {
+    ref.current = material;
+    return () => material.dispose();
+  }, [material]);
+  return ref;
+}

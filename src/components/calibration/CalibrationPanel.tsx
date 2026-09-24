@@ -64,14 +64,19 @@ export function CalibrationPanel({ object }: { object: TrackedObject }) {
   const [dirty, setDirty] = useState(false);
 
   // 범위를 바꾸거나 저장값이 바뀌면(다른 화면에서 저장 등) 입력값을 저장값으로 재설정
-  useEffect(() => {
+  const [prevSaved, setPrevSaved] = useState(saved);
+  if (saved !== prevSaved) {
+    setPrevSaved(saved);
     setValues(saved);
     setDirty(false);
-  }, [saved]);
+  }
 
-  useEffect(() => {
+  // 연결된 인스턴스가 바뀌면 이름도 그 인스턴스 이름으로
+  const [prevInstance, setPrevInstance] = useState(boundInstance);
+  if (boundInstance !== prevInstance) {
+    setPrevInstance(boundInstance);
     if (boundInstance) setName(boundInstance.name);
-  }, [boundInstance]);
+  }
 
   const errors = useMemo(() => validateCalibrationValues(values), [values]);
   const hasErrors = Object.values(errors).some(Boolean);

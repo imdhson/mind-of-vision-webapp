@@ -30,7 +30,7 @@ export default function VisionTab({ active }: { active: boolean }) {
   const palette = theme === 'dark' ? DARK_PALETTE : LIGHT_PALETTE;
   const [autoMode, setAutoMode] = useState(true);
   const [resetToken, setResetToken] = useState(0);
-  const webgl = useMemo(hasWebGL, []);
+  const [webgl] = useState(hasWebGL);
   const count = useObjectStore((s) => s.order.length);
   const hfovRad = useHorizontalFov();
 
