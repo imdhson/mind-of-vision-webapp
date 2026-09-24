@@ -39,9 +39,7 @@ export const useObjectStore = create<ObjectState>((set, get) => ({
   setObjects(list) {
     const objects: Record<string, TrackedObject> = {};
     for (const o of list) objects[o.id] = o;
-    const order = [...list]
-      .sort((a, b) => a.firstSeenAt - b.firstSeenAt || a.id.localeCompare(b.id))
-      .map((o) => o.id);
+    const order = [...list].sort((a, b) => a.firstSeenAt - b.firstSeenAt || a.id.localeCompare(b.id)).map((o) => o.id);
     const prev = get();
     let { selectedId, selectionEndedLabel } = prev;
     if (selectedId && !objects[selectedId]) {

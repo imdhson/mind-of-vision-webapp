@@ -77,8 +77,8 @@ export function ObjectDetails({ object: o }: { object: TrackedObject }) {
         <AppliedCalibration values={o.calibration.values} sources={o.calibration.sources} />
       </div>
       <p className="pt-2 text-[10.5px] leading-snug text-muted">
-        좌표는 카메라(사용자) 기준 상대 위치입니다. X 오른쪽(+), Y 바닥에서 위(+), Z 전방(−). 단안 카메라 추정값이므로 실측과 다를 수
-        있습니다.
+        좌표는 카메라(사용자) 기준 상대 위치입니다. X 오른쪽(+), Y 바닥에서 위(+), Z 전방(−). 단안 카메라 추정값이므로
+        실측과 다를 수 있습니다.
       </p>
     </div>
   );

@@ -149,12 +149,16 @@ export function CalibrationPanel({ object }: { object: TrackedObject }) {
       if (!boundId) return;
       if (!confirm(`'${boundInstance?.name}' 개별 보정값을 삭제할까요?`)) return;
       const r = await s.deleteInstance(boundId);
-      setStatus(r.persisted ? { kind: 'ok', text: '개별 보정값을 삭제했습니다.' } : { kind: 'warn', text: r.error ?? '' });
+      setStatus(
+        r.persisted ? { kind: 'ok', text: '개별 보정값을 삭제했습니다.' } : { kind: 'warn', text: r.error ?? '' },
+      );
     } else {
       if (!classCal) return;
       if (!confirm(`모든 '${object.className}'에 적용되는 클래스 보정값을 초기화할까요?`)) return;
       const r = await s.deleteClass(object.classId);
-      setStatus(r.persisted ? { kind: 'ok', text: '클래스 보정값을 초기화했습니다.' } : { kind: 'warn', text: r.error ?? '' });
+      setStatus(
+        r.persisted ? { kind: 'ok', text: '클래스 보정값을 초기화했습니다.' } : { kind: 'warn', text: r.error ?? '' },
+      );
     }
     setValues({});
     setDirty(false);
@@ -167,8 +171,7 @@ export function CalibrationPanel({ object }: { object: TrackedObject }) {
       : scope === 'instance'
         ? '이 물체 전용으로 저장 · 앱 재실행 후에는 "저장된 개별 보정 연결"에서 직접 연결해야 적용'
         : `모든 '${object.className}'에 기본 적용 · 저장됨 (개별/임시 보정이 우선)`;
-  const canReset =
-    scope === 'session' ? !!sessionValues : scope === 'instance' ? !!boundId : !!classCal;
+  const canReset = scope === 'session' ? !!sessionValues : scope === 'instance' ? !!boundId : !!classCal;
 
   return (
     <div className="space-y-3" data-testid="calibration-panel">
@@ -176,7 +179,10 @@ export function CalibrationPanel({ object }: { object: TrackedObject }) {
         <div className="text-[12px] text-muted">
           추정 <span className="tabular text-fg">{fmtDistance(object.estimatedDistance)}</span>
           <span className="mx-1.5">→</span>
-          보정 <span className="tabular font-semibold text-fg" data-testid="corrected-distance">{fmtDistance(object.correctedDistance)}</span>
+          보정{' '}
+          <span className="tabular font-semibold text-fg" data-testid="corrected-distance">
+            {fmtDistance(object.correctedDistance)}
+          </span>
         </div>
         {previewing ? <Badge tone="strong">미리보기 · 저장 안 됨</Badge> : null}
       </div>
@@ -224,7 +230,12 @@ export function CalibrationPanel({ object }: { object: TrackedObject }) {
           ]}
         />
         <label className="flex items-center gap-1.5 text-[12px] text-muted">
-          <input type="checkbox" checked={preview} onChange={(e) => setPreview(e.target.checked)} className="accent-current" />
+          <input
+            type="checkbox"
+            checked={preview}
+            onChange={(e) => setPreview(e.target.checked)}
+            className="accent-current"
+          />
           입력 중 미리보기
         </label>
       </div>
@@ -249,11 +260,18 @@ export function CalibrationPanel({ object }: { object: TrackedObject }) {
         ))}
       </div>
       <p className="text-[10.5px] leading-snug text-muted">
-        우선순위: 실제 거리가 있으면 실제 크기·거리 보정값은 거리 계산에 쓰지 않습니다(중복 적용 방지). 빈 칸 = 보정 없음.
+        우선순위: 실제 거리가 있으면 실제 크기·거리 보정값은 거리 계산에 쓰지 않습니다(중복 적용 방지). 빈 칸 = 보정
+        없음.
       </p>
 
       <div className="flex gap-2">
-        <Button variant="primary" className="flex-1" onClick={() => void onSave()} disabled={hasErrors} data-testid="calibration-save">
+        <Button
+          variant="primary"
+          className="flex-1"
+          onClick={() => void onSave()}
+          disabled={hasErrors}
+          data-testid="calibration-save"
+        >
           {scope === 'session' ? '적용' : '저장'}
         </Button>
         <Button

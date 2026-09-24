@@ -35,9 +35,12 @@ export function profileKey(deviceId: string): string {
   return `cam:${deviceId || 'default'}`;
 }
 
-export function createDefaultProfile(device: Pick<CameraDeviceInfo, 'deviceId' | 'label' | 'lensKind' | 'facing'>): CameraProfile {
+export function createDefaultProfile(
+  device: Pick<CameraDeviceInfo, 'deviceId' | 'label' | 'lensKind' | 'facing'>,
+): CameraProfile {
   const mobile = isProbablyMobile();
-  const lens: LensKind = device.lensKind === 'unknown' && mobile && device.facing === 'environment' ? 'wide' : device.lensKind;
+  const lens: LensKind =
+    device.lensKind === 'unknown' && mobile && device.facing === 'environment' ? 'wide' : device.lensKind;
   return {
     id: profileKey(device.deviceId),
     deviceId: device.deviceId,

@@ -19,11 +19,17 @@ export function InstanceLinker({ object }: { object: TrackedObject }) {
   const [pick, setPick] = useState('');
 
   const candidates = useMemo(() => {
-    const usedElsewhere = new Set(Object.entries(bindings).filter(([t]) => t !== object.id).map(([, i]) => i));
+    const usedElsewhere = new Set(
+      Object.entries(bindings)
+        .filter(([t]) => t !== object.id)
+        .map(([, i]) => i),
+    );
     return Object.values(instances)
       .filter((i) => i.classId === object.classId && !usedElsewhere.has(i.id))
       .map((i) => ({ inst: i, sim: appearanceSimilarity(object.appearance, i.appearance) }))
       .sort((a, b) => (b.sim ?? -1) - (a.sim ?? -1));
+    // 외형은 매 프레임 조금씩 바뀌므로 의존성에서 제외: 후보 순서가 계속 바뀌어 목록이 흔들리지 않게 함
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [instances, bindings, object.id, object.classId]);
 
   if (boundId) {

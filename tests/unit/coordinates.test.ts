@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  boxToCameraPoint,
-  cameraToView,
-  pixelRay,
-  viewToCamera,
-} from '../../src/features/depth/CoordinateTransformer';
+import { boxToCameraPoint, cameraToView, pixelRay, viewToCamera } from '../../src/features/depth/CoordinateTransformer';
 import { computeIntrinsics } from '../../src/features/camera/CameraCalibration';
 import { box } from './helpers';
 

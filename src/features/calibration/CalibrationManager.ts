@@ -28,14 +28,54 @@ export interface FieldSpec {
 }
 
 export const CALIBRATION_FIELDS: FieldSpec[] = [
-  { key: 'measuredDistance', label: '실제 거리', unit: 'm', min: 0.1, max: 100, step: 0.01, help: '직접 측정한 카메라→객체 거리. 설정 시 실제 크기·거리 보정값보다 우선' },
-  { key: 'distanceOffset', label: '거리 보정값', unit: 'm', min: -20, max: 20, step: 0.01, help: '추정 거리에 더하는 값(±). 실제 거리가 없을 때만 적용' },
-  { key: 'realHeight', label: '실제 높이', unit: 'm', min: 0.01, max: 50, step: 0.01, help: '거리 추정에 사용할 객체의 실제 높이' },
-  { key: 'realWidth', label: '실제 너비', unit: 'm', min: 0.01, max: 50, step: 0.01, help: '거리 추정에 사용할 객체의 실제 너비' },
+  {
+    key: 'measuredDistance',
+    label: '실제 거리',
+    unit: 'm',
+    min: 0.1,
+    max: 100,
+    step: 0.01,
+    help: '직접 측정한 카메라→객체 거리. 설정 시 실제 크기·거리 보정값보다 우선',
+  },
+  {
+    key: 'distanceOffset',
+    label: '거리 보정값',
+    unit: 'm',
+    min: -20,
+    max: 20,
+    step: 0.01,
+    help: '추정 거리에 더하는 값(±). 실제 거리가 없을 때만 적용',
+  },
+  {
+    key: 'realHeight',
+    label: '실제 높이',
+    unit: 'm',
+    min: 0.01,
+    max: 50,
+    step: 0.01,
+    help: '거리 추정에 사용할 객체의 실제 높이',
+  },
+  {
+    key: 'realWidth',
+    label: '실제 너비',
+    unit: 'm',
+    min: 0.01,
+    max: 50,
+    step: 0.01,
+    help: '거리 추정에 사용할 객체의 실제 너비',
+  },
   { key: 'offsetX', label: 'X축 보정', unit: 'm', min: -20, max: 20, step: 0.01, help: '좌우 위치(+ 오른쪽)' },
   { key: 'offsetY', label: 'Y축 보정', unit: 'm', min: -20, max: 20, step: 0.01, help: '높이(+ 위)' },
   { key: 'offsetZ', label: 'Z축 보정', unit: 'm', min: -20, max: 20, step: 0.01, help: '깊이(+ 사용자 쪽, − 멀어짐)' },
-  { key: 'yawOffsetDeg', label: '방향 보정', unit: '°', min: -180, max: 180, step: 1, help: '방향 회전. 방향 미확인 객체는 이 값이 방향이 됨(0°=사용자 쪽)' },
+  {
+    key: 'yawOffsetDeg',
+    label: '방향 보정',
+    unit: '°',
+    min: -180,
+    max: 180,
+    step: 1,
+    help: '방향 회전. 방향 미확인 객체는 이 값이 방향이 됨(0°=사용자 쪽)',
+  },
 ];
 
 export const FIELD_MAP = Object.fromEntries(CALIBRATION_FIELDS.map((f) => [f.key, f])) as Record<

@@ -19,7 +19,14 @@ const profile = (deviceId: string, hfov: number): CameraProfile => ({
 describe('CalibrationStorage (IndexedDB)', () => {
   beforeEach(async () => {
     await calibrationStorage.clearAll();
-    useCalibrationStore.setState({ profiles: {}, classCals: {}, instances: {}, session: {}, bindings: {}, draft: null });
+    useCalibrationStore.setState({
+      profiles: {},
+      classCals: {},
+      instances: {},
+      session: {},
+      bindings: {},
+      draft: null,
+    });
   });
 
   it('persists and reloads data in a fresh connection (simulated app restart)', async () => {
@@ -92,7 +99,14 @@ describe('CalibrationStorage (IndexedDB)', () => {
 
   it('refuses to save an instance calibration onto a different class', async () => {
     const store = useCalibrationStore.getState();
-    const r = await store.saveInstance({ trackId: 't1', classId: 'cup', name: 'c', values: { offsetX: 1 }, cameraKey: null, appearance: null });
+    const r = await store.saveInstance({
+      trackId: 't1',
+      classId: 'cup',
+      name: 'c',
+      values: { offsetX: 1 },
+      cameraKey: null,
+      appearance: null,
+    });
     const bad = await store.saveInstance({
       trackId: 't2',
       instanceId: r.id,
