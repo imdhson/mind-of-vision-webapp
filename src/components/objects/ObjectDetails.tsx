@@ -95,7 +95,9 @@ export function AppliedCalibration({
     ([k]) => k !== 'referenceRawDistance',
   );
   if (!entries.length) return <Row k="적용된 사용자 보정값" v="없음" />;
-  const offsetIgnored = values.measuredDistance != null && values.distanceOffset != null;
+  const measured = values.measuredDistance != null;
+  const ignoredKeys = new Set(['distanceOffset', 'realHeight', 'realWidth']);
+  const offsetIgnored = measured && [...ignoredKeys].some((k) => values[k as keyof CalibrationValues] != null);
   return (
     <div className="py-0.5">
       <div className="py-1 text-[12px] text-muted">적용된 사용자 보정값</div>
@@ -107,7 +109,7 @@ export function AppliedCalibration({
             key={k}
             k={spec?.label ?? k}
             v={
-              <span className={k === 'distanceOffset' && offsetIgnored ? 'text-muted line-through' : undefined}>
+              <span className={measured && ignoredKeys.has(k) ? 'text-muted line-through' : undefined}>
                 {spec?.unit === 'm' ? fmtMeters(v) : `${v}${spec?.unit ?? ''}`}
               </span>
             }
@@ -116,7 +118,7 @@ export function AppliedCalibration({
         );
       })}
       {offsetIgnored ? (
-        <p className="text-[10.5px] text-muted">실제 거리가 설정되어 거리 보정값은 적용되지 않습니다.</p>
+        <p className="text-[10.5px] text-muted">실제 거리가 설정되어 취소선 항목은 거리 계산에 적용되지 않습니다.</p>
       ) : null}
     </div>
   );

@@ -26,7 +26,8 @@ const LENGTH_KEYS = new Set<keyof CalibrationValues>([
   'offsetZ',
 ]);
 
-const SIZE_KEYS: (keyof CalibrationValues)[] = ['realHeight', 'realWidth'];
+/** 실제 거리가 설정되면 거리 계산에서 제외되는 항목 */
+const OVERRIDDEN_BY_MEASURED = new Set<keyof CalibrationValues>(['distanceOffset', 'realHeight', 'realWidth']);
 
 /**
  * 선택한 실시간 객체의 보정값 입력·저장
@@ -236,7 +237,7 @@ export function CalibrationPanel({ object }: { object: TrackedObject }) {
             unit={LENGTH_KEYS.has(spec.key) ? unit : null}
             value={values[spec.key]}
             error={errors[spec.key]}
-            disabled={spec.key === 'distanceOffset' && values.measuredDistance != null}
+            overridden={OVERRIDDEN_BY_MEASURED.has(spec.key) && values.measuredDistance != null}
             placeholder={
               spec.key === 'measuredDistance' && object.correctedDistance != null
                 ? toUnit(object.correctedDistance, unit).toFixed(unit === 'cm' ? 0 : 2)
@@ -248,7 +249,7 @@ export function CalibrationPanel({ object }: { object: TrackedObject }) {
         ))}
       </div>
       <p className="text-[10.5px] leading-snug text-muted">
-        우선순위: 실제 거리 &gt; 거리 보정값(동시 적용 안 함). 실제 크기는 거리 추정 입력값으로 사용됩니다. 빈 칸 = 보정 없음.
+        우선순위: 실제 거리가 있으면 실제 크기·거리 보정값은 거리 계산에 쓰지 않습니다(중복 적용 방지). 빈 칸 = 보정 없음.
       </p>
 
       <div className="flex gap-2">
@@ -297,7 +298,7 @@ function CalField({
   unit,
   value,
   error,
-  disabled,
+  overridden,
   placeholder,
   onChange,
   trackId,
@@ -306,7 +307,7 @@ function CalField({
   unit: Unit | null;
   value: number | undefined;
   error?: string;
-  disabled?: boolean;
+  overridden?: boolean;
   placeholder?: string;
   onChange: (v: number | undefined) => void;
   trackId: string;
@@ -323,8 +324,7 @@ function CalField({
       step={spec.step * f}
       value={display}
       error={error}
-      hint={disabled ? '실제 거리 우선 적용 중' : undefined}
-      disabled={disabled}
+      hint={overridden ? '실제 거리가 우선 적용됨' : undefined}
       placeholder={placeholder}
       onChange={(v) => onChange(v == null ? undefined : Number.isNaN(v) ? NaN : v / f)}
     />
@@ -337,8 +337,8 @@ function round(v: number, digits: number) {
 }
 
 /**
- * 저장 전 값 준비: 실제 거리가 있으면 비율 계산용 기준 추정값(referenceRawDistance)을 기록합니다.
- * 실제 거리·실제 크기가 모두 이전과 같으면 기존 기준값을 유지합니다.
+ * 저장 전 값 준비: 실제 거리가 있으면 비율 계산용 기준값(현재 원본 추정 거리)을 referenceRawDistance 로 기록합니다.
+ * 실제 거리가 이전과 같으면 기존 기준값을 유지합니다.
  */
 function prepare(
   values: CalibrationValues,
@@ -350,12 +350,10 @@ function prepare(
     delete clean.referenceRawDistance;
     return { ok: true, values: clean };
   }
-  const unchanged =
-    clean.measuredDistance === saved.measuredDistance &&
-    SIZE_KEYS.every((k) => clean[k] === saved[k]) &&
-    saved.referenceRawDistance != null;
-  if (unchanged) return { ok: true, values: { ...clean, referenceRawDistance: saved.referenceRawDistance } };
-  const base = getVisionPipeline().baseDistanceFor(trackId, clean);
+  if (clean.measuredDistance === saved.measuredDistance && saved.referenceRawDistance != null) {
+    return { ok: true, values: { ...clean, referenceRawDistance: saved.referenceRawDistance } };
+  }
+  const base = getVisionPipeline().rawDistanceFor(trackId);
   if (base == null || !Number.isFinite(base)) {
     return { ok: false, error: '현재 객체의 거리를 계산할 수 없어 실제 거리를 기준으로 저장할 수 없습니다.' };
   }

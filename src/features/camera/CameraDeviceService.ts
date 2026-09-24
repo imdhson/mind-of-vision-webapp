@@ -10,8 +10,8 @@ import type { CameraDeviceInfo, CameraError, FacingMode, LensKind } from '../../
 
 const RE_ULTRA = /ultra[\s-]?wide|ultrawide|초광각|울트라\s?와이드|0\.5x/i;
 const RE_TELE = /tele(photo)?|망원|periscope|[2-9](\.\d)?x\b/i;
-const RE_FRONT = /front|facing front|user|전면|셀카|facetime/i;
-const RE_BACK = /back|rear|facing back|environment|후면|world/i;
+const RE_FRONT = /\bfront\b|전면|셀카|facetime/i;
+const RE_BACK = /\bback\b|\brear\b|후면/i;
 const RE_EXTERNAL = /usb|external|외장|logitech|webcam|brio|c9\d\d|capture|obs|virtual/i;
 const RE_WIDE = /\bwide\b|광각|main|기본/i;
 

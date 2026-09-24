@@ -1,4 +1,4 @@
-import type { AppearanceSignature, CalibrationValues, CameraProfile, TrackSnapshot, TrackedObject } from '../../types';
+import type { AppearanceSignature, CameraProfile, TrackSnapshot, TrackedObject } from '../../types';
 import { useCameraStore } from '../../stores/cameraStore';
 import { useCalibrationStore } from '../../stores/calibrationStore';
 import { useObjectStore } from '../../stores/objectStore';
@@ -35,7 +35,6 @@ class VisionPipelineImpl {
   private loopToken = 0;
   private lastTracks: TrackSnapshot[] = [];
   private lastObservedAt = 0;
-  private lastGeneration = -1;
   private fpsSamples: number[] = [];
   private appearanceCanvas: HTMLCanvasElement | null = null;
   private unsubscribers: (() => void)[] = [];
@@ -138,9 +137,6 @@ class VisionPipelineImpl {
         const detections = await this.detector!.detect(video, { maxDetections: 20, minScore: 0.45 });
         if (token !== this.loopToken) return;
         if (useCameraStore.getState().generation !== generation) continue; // 이전 스트림 결과 폐기
-        if (this.lastGeneration !== generation) {
-          this.lastGeneration = generation;
-        }
         const inferenceMs = performance.now() - timestamp;
         const appearances = appearanceFrame
           ? detections.map((d) => computeAppearance(appearanceFrame.data, appearanceFrame.width, appearanceFrame.height, d.box))
@@ -228,15 +224,14 @@ class VisionPipelineImpl {
   }
 
   /**
-   * 특정 추적 객체에 주어진 보정값을 적용했을 때의 기준 거리(실측 거리 비율 계산용).
+   * 실제 거리 비율 계산용 기준값: 해당 객체의 현재 원본 추정 거리(보정 없음).
    * 실제 거리 저장 시 referenceRawDistance 로 기록합니다.
    */
-  baseDistanceFor(trackId: string, values: CalibrationValues): number | null {
+  rawDistanceFor(trackId: string): number | null {
     const track = this.lastTracks.find((t) => t.id === trackId);
     const ctx = this.buildContext();
     if (!track || !ctx) return null;
-    const { measuredDistance: _m, referenceRawDistance: _r, distanceOffset: _o, ...sizeOnly } = values;
-    return computeGeometry(track, sizeOnly, ctx).baseDistance;
+    return computeGeometry(track, {}, ctx).estimatedDistance;
   }
 
   private publish(observedFrame: boolean, timestamp = performance.now()) {

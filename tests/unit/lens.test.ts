@@ -19,6 +19,11 @@ describe('classifyLens', () => {
     expect(r.facing).toBe(facing);
   });
 
+  it('does not misread words inside paths or names as facing', () => {
+    expect(classifyLens('/home/user/video.mjpeg').facing).toBe('unknown');
+    expect(classifyLens('Backstage Capture').facing).toBe('unknown');
+  });
+
   it('prefers the track-reported facing mode', () => {
     expect(classifyLens('Integrated Camera', 'user').facing).toBe('user');
   });

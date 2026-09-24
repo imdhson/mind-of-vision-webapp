@@ -7,6 +7,8 @@ import { getCameraManager } from '../../features/camera/CameraManager';
 import { initSettings } from '../../services/settings';
 import { registerServiceWorker } from '../../services/pwa';
 import { useWakeLock } from '../../hooks/useWakeLock';
+import { getDebugBridge } from '../../services/debugBridge';
+import { useUIStore as ui } from '../../stores/uiStore';
 
 let booted = false;
 
@@ -22,6 +24,7 @@ export function AppRuntime({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (booted) return;
     booted = true;
+    getDebugBridge();
     const pipeline = getVisionPipeline();
     void (async () => {
       await Promise.all([useCalibrationStore.getState().load(), initSettings()]);
@@ -43,6 +46,15 @@ export function AppRuntime({ children }: { children: ReactNode }) {
       useCameraStore.subscribe((s, prev) => {
         const id = s.active?.deviceId;
         if (id && id !== prev.active?.deviceId) useUIStore.getState().setPreferredDeviceId(id);
+      }),
+    [],
+  );
+
+  // 카메라 실행 중 발생한 오류(전환 실패 후 복구 등)는 토스트로 안내
+  useEffect(
+    () =>
+      useCameraStore.subscribe((s, prev) => {
+        if (s.error && s.error !== prev.error && s.status === 'running') ui.getState().toast(s.error.message, 'error');
       }),
     [],
   );

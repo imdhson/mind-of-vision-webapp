@@ -59,7 +59,7 @@ export const ObjectMesh = memo(function ObjectMesh({
   const motion = useRef<Group>(null);
   const labelAnchor = useRef<Group>(null);
   const labelEl = useRef<HTMLDivElement>(null);
-  const state = useRef({ init: false, yaw: 0, sx: 0.3, sy: 0.3, sz: 0.3, opacity: 1, lastText: '' });
+  const state = useRef({ init: false, bodyYaw: 0, facingYaw: 0, sx: 0.3, sy: 0.3, sz: 0.3, opacity: 1, lastText: '' });
 
   const material = useMemo(
     () => new MeshStandardMaterial({ color: palette.object, roughness: 0.55, metalness: 0.05, transparent: true }),
@@ -104,12 +104,17 @@ export const ObjectMesh = memo(function ObjectMesh({
     d = clamp(d, DISPLAY_MIN, 40);
 
     const baseY = Math.max(0, o.position.y - h / 2);
+    // 방향: 알 수 있을 때만 회전. 몸체가 긴 객체(+X 정면)는 방향을 모르면 영상에서 보이는 대로 옆으로(X축) 배치
+    const facingYaw = o.orientation.facingYaw;
+    const longBody = LONG_BODY.has(info.shape);
+    const bodyTarget = longBody ? (facingYaw != null ? facingYaw - Math.PI / 2 : 0) : (facingYaw ?? 0);
     if (!s.init) {
       g.position.set(o.position.x, baseY, o.position.z);
       s.sx = w;
       s.sy = h;
       s.sz = d;
-      s.yaw = o.rotation?.y ?? 0;
+      s.bodyYaw = bodyTarget;
+      s.facingYaw = facingYaw ?? 0;
       s.init = true;
     } else {
       const kp = dampFactor(dt, POS_TC);
@@ -121,13 +126,10 @@ export const ObjectMesh = memo(function ObjectMesh({
       s.sy += (h - s.sy) * ks;
       s.sz += (d - s.sz) * ks;
     }
-
-    // 방향: 알 수 있을 때만 회전. 모르면 사용자 쪽(0)으로 천천히 복귀하되 화살표는 숨김
-    const facingYaw = o.orientation.facingYaw;
-    const targetYaw = facingYaw ?? 0;
-    s.yaw = lerpAngle(s.yaw, targetYaw, dampFactor(dt, ROT_TC));
-    // 몸체가 긴 객체는 +X 가 정면 → yaw 에서 90° 보정
-    b.rotation.y = LONG_BODY.has(info.shape) ? s.yaw - Math.PI / 2 : s.yaw;
+    const kr = dampFactor(dt, ROT_TC);
+    s.bodyYaw = lerpAngle(s.bodyYaw, bodyTarget, kr);
+    if (facingYaw != null) s.facingYaw = lerpAngle(s.facingYaw, facingYaw, kr);
+    b.rotation.y = s.bodyYaw;
     b.scale.set(s.sx, s.sy, s.sz);
 
     if (hit.current) {
@@ -151,7 +153,7 @@ export const ObjectMesh = memo(function ObjectMesh({
 
     if (facing.current) {
       facing.current.visible = facingYaw != null;
-      facing.current.rotation.y = s.yaw;
+      facing.current.rotation.y = s.facingYaw;
       const r = Math.max(0.2, Math.max(s.sx, s.sz) * 0.6);
       facing.current.position.set(0, 0.012, 0);
       facing.current.scale.setScalar(r);
@@ -203,7 +205,7 @@ export const ObjectMesh = memo(function ObjectMesh({
       </mesh>
       {/* 바닥 위치 링: 작은 객체도 위치를 쉽게 파악 */}
       <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.006, 0]} material={ringMat} raycast={() => null}>
-        <ringGeometry args={[0.86, 1, 40]} />
+        <ringGeometry args={[0.9, 1, 48]} />
       </mesh>
       {/* 바라보는 방향 표시 (알 수 있을 때만) */}
       <group ref={facing} visible={false}>

@@ -10,6 +10,7 @@ import { AutoZoomController, homePose } from './AutoCameraController';
 import { ObjectMesh } from './ObjectRenderer';
 import { UserMarker } from './UserMarker';
 import type { ScenePalette } from './palette';
+import { getDebugBridge } from '../../services/debugBridge';
 
 /**
  * Tesla 스타일 미니멀 3D 공간
@@ -70,6 +71,7 @@ export function VisionScene({ active, palette, hfovRad, autoMode, onUserInteract
       <UserMarker palette={palette} hfovRad={hfovRad} />
       <Objects palette={palette} />
       <CameraRig autoMode={autoMode} onUserInteract={onUserInteract} resetToken={resetToken} />
+      <DebugProjection />
     </Canvas>
   );
 }
@@ -187,4 +189,32 @@ function CameraRig({
       }}
     />
   );
+}
+
+/** ?debug=1 일 때만: 3D 객체를 화면 좌표로 투영하는 함수를 테스트에 제공 */
+function DebugProjection() {
+  const { camera, scene, gl } = useThree();
+  useEffect(() => {
+    const bridge = getDebugBridge();
+    if (!bridge) return;
+    const v = new Vector3();
+    bridge.projectObject = (id: string) => {
+      let target: import('three').Object3D | null = null;
+      scene.traverse((o) => {
+        if (!target && o.type === 'Group' && o.userData.objectId === id) target = o;
+      });
+      if (!target) return null;
+      const t = target as import('three').Object3D;
+      const o = useObjectStore.getState().objects[id];
+      t.getWorldPosition(v);
+      v.y += (o?.size?.height ?? 0.4) / 2;
+      v.project(camera);
+      const rect = gl.domElement.getBoundingClientRect();
+      return { x: rect.left + ((v.x + 1) / 2) * rect.width, y: rect.top + ((1 - v.y) / 2) * rect.height };
+    };
+    return () => {
+      bridge.projectObject = undefined;
+    };
+  }, [camera, scene, gl]);
+  return null;
 }

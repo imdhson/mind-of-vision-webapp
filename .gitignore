@@ -15,3 +15,4 @@ public/models/coco-ssd-mobilenet-v2/
 # 배포용 ZIP / 테스트 산출물
 *.zip
 tests/e2e/output/
+tests/e2e/fixtures/

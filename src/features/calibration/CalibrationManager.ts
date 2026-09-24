@@ -14,7 +14,8 @@ import type {
  *   현재 추적 객체의 임시 보정(session) > 개별 객체 보정(instance) > 클래스 기본 보정(class) > 모델 기본값
  *
  * 거리 보정 우선순위:
- *   실제 거리(measuredDistance)가 설정되면 거리 보정값(distanceOffset)은 적용하지 않습니다.
+ *   실제 거리(measuredDistance)가 설정되면 실제 크기(realHeight/realWidth)와 거리 보정값(distanceOffset)은
+ *   거리 계산에 적용하지 않습니다. 실제 거리는 원본 추정값 대비 비율로 저장됩니다.
  */
 export interface FieldSpec {
   key: keyof CalibrationValues;
@@ -27,7 +28,7 @@ export interface FieldSpec {
 }
 
 export const CALIBRATION_FIELDS: FieldSpec[] = [
-  { key: 'measuredDistance', label: '실제 거리', unit: 'm', min: 0.1, max: 100, step: 0.01, help: '직접 측정한 카메라→객체 거리. 설정 시 거리 보정값보다 우선' },
+  { key: 'measuredDistance', label: '실제 거리', unit: 'm', min: 0.1, max: 100, step: 0.01, help: '직접 측정한 카메라→객체 거리. 설정 시 실제 크기·거리 보정값보다 우선' },
   { key: 'distanceOffset', label: '거리 보정값', unit: 'm', min: -20, max: 20, step: 0.01, help: '추정 거리에 더하는 값(±). 실제 거리가 없을 때만 적용' },
   { key: 'realHeight', label: '실제 높이', unit: 'm', min: 0.01, max: 50, step: 0.01, help: '거리 추정에 사용할 객체의 실제 높이' },
   { key: 'realWidth', label: '실제 너비', unit: 'm', min: 0.01, max: 50, step: 0.01, help: '거리 추정에 사용할 객체의 실제 너비' },

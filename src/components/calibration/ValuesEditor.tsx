@@ -56,7 +56,11 @@ export function ValuesEditor({
             step={spec.step}
             value={values[spec.key]}
             error={errors[spec.key]}
-            disabled={spec.key === 'distanceOffset' && values.measuredDistance != null}
+            hint={
+              values.measuredDistance != null && ['distanceOffset', 'realHeight', 'realWidth'].includes(spec.key)
+                ? '실제 거리가 우선 적용됨'
+                : undefined
+            }
             onChange={(v) =>
               setValues((prev) => {
                 const n = { ...prev };

@@ -40,7 +40,7 @@ describe('computeGeometry (estimate vs corrected)', () => {
   });
 
   it('measured distance reproduces the measurement and keeps raw estimate separate', () => {
-    const base = computeGeometry(track, {}, ctx).baseDistance!;
+    const base = computeGeometry(track, {}, ctx).estimatedDistance!;
     const g = computeGeometry(track, { measuredDistance: 1.5, referenceRawDistance: base }, ctx);
     expect(g.correctedDistance).toBeCloseTo(1.5);
     expect(g.estimatedDistance).toBeCloseTo(base);
@@ -52,6 +52,16 @@ describe('computeGeometry (estimate vs corrected)', () => {
     const g = computeGeometry(track, { offsetX: 0.5, offsetZ: -1 }, ctx);
     expect(g.position!.x - g.rawPosition!.x).toBeCloseTo(0.5);
     expect(g.position!.z - g.rawPosition!.z).toBeCloseTo(-1);
+  });
+
+  it('measured distance wins over class real size and offset (no double application)', () => {
+    const raw = computeGeometry(track, {}, ctx).estimatedDistance!;
+    const g = computeGeometry(
+      track,
+      { measuredDistance: 2, referenceRawDistance: raw, realHeight: 0.3, distanceOffset: 1 },
+      ctx,
+    );
+    expect(g.correctedDistance).toBeCloseTo(2);
   });
 
   it('real size override changes the estimate input, not the raw estimate', () => {

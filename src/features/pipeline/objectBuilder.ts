@@ -18,8 +18,10 @@ import { boxCenter } from '../../utils/geometry';
  *
  * 처리 순서:
  *  1) 원본 추정: 클래스 사전 크기 + 카메라 프로파일 → estimatedDistance, rawPosition
- *  2) 크기 보정(실제 높이/너비)을 반영한 기준 추정 → base
- *  3) 거리 보정: 실제 거리(비율) 우선, 없으면 거리 보정값 → correctedDistance
+ *  2) 거리 보정 (우선순위)
+ *     a. 실제 거리가 있으면: 원본 추정 × (실제 거리 / 실측 당시 원본 추정) — 크기·거리 보정값 무시
+ *     b. 없으면: 실제 크기(높이/너비)로 다시 추정한 값 + 거리 보정값
+ *     → correctedDistance
  *  4) 카메라 좌표 → 시각화 좌표 변환 후 X/Y/Z 위치 보정 → position
  *  방향(orientation)은 호출 측에서 rawPosition 기반으로 계산해 전달합니다.
  */
@@ -66,7 +68,10 @@ export function computeGeometry(track: TrackSnapshot, values: CalibrationValues,
       size: null,
     };
   }
-  const hasSize = values.realHeight != null || values.realWidth != null;
+  // 실제 거리(실측)가 있으면 그것이 최우선: 크기 보정·거리 보정값은 거리 계산에 쓰지 않음(중복 적용 방지)
+  // → 비율의 기준은 항상 크기 보정 없는 원본 추정값
+  const measured = values.measuredDistance != null;
+  const hasSize = !measured && (values.realHeight != null || values.realWidth != null);
   const sized = hasSize
     ? (estimateDistance({ box: track.box, ...common, sizeOverride: values }) ?? raw)
     : raw;
@@ -79,8 +84,8 @@ export function computeGeometry(track: TrackSnapshot, values: CalibrationValues,
 
   const toView = (p: Vec3, sizeHeight: number) => {
     const v = cameraToView(p, ctx.profile.cameraHeight, ctx.pitch);
-    // 바닥에 놓이는 객체는 바닥 위에 놓이도록 중심 높이를 높이/2 이상으로 유지
-    if (info.grounded) v.y = Math.max(v.y, sizeHeight / 2);
+    // 바닥에 놓이는 클래스(사람·가구·동물 등)는 바닥 위에 선 것으로 가정: 중심 높이 = 높이/2
+    if (info.grounded) v.y = sizeHeight / 2;
     else v.y = Math.max(v.y, 0.02);
     return v;
   };
