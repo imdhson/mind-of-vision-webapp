@@ -155,7 +155,7 @@ PWA·카메라를 위해 **반드시 HTTPS 로 배포**하세요.
 
 ### GitHub Pages 자동 배포
 
-`.github/workflows/deploy-pages.yml` 이 기본 브랜치에 push 될 때마다 테스트·빌드 후 GitHub Pages(HTTPS)에 배포합니다.
+`.github/workflows/deploy-pages.yml` 이 `main` 브랜치에 push(병합) 될 때만 테스트·빌드 후 GitHub Pages(HTTPS)에 배포합니다.
 
 1. 저장소 **Settings → Pages → Build and deployment → Source** 를 **GitHub Actions** 로 설정 (최초 1회)
 2. **Actions** 탭에서 "Deploy to GitHub Pages" 를 다시 실행하거나 새 커밋을 push
