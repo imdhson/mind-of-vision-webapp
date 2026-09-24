@@ -32,6 +32,8 @@ export function CameraSettings() {
   const saved = key ? profiles[key] : undefined;
   const base: CameraProfile | null = useMemo(
     () => (active ? (saved ?? createDefaultProfile(active)) : null),
+    // 줌 등 active 의 다른 값이 바뀔 때 입력 중인 폼이 초기화되지 않도록 장치 ID 로만 판단
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
     [active?.deviceId, saved],
   );
   const [form, setForm] = useState<CameraProfile | null>(base);
@@ -44,7 +46,12 @@ export function CameraSettings() {
 
   const intr =
     active && form && !hasErrors
-      ? computeIntrinsics(form, active.videoWidth, active.videoHeight, zoomFactorOf(active.currentZoom, active.zoom?.min ?? null))
+      ? computeIntrinsics(
+          form,
+          active.videoWidth,
+          active.videoHeight,
+          zoomFactorOf(active.currentZoom, active.zoom?.min ?? null),
+        )
       : null;
 
   const otherProfiles = Object.values(profiles).filter((p) => p.id !== key);
@@ -52,13 +59,21 @@ export function CameraSettings() {
   return (
     <Section title="카메라 설정 · 보정">
       {!active || !form ? (
-        <p className="px-3 py-3 text-[12.5px] text-muted">카메라를 시작하면 현재 카메라의 보정값을 설정할 수 있습니다.</p>
+        <p className="px-3 py-3 text-[12.5px] text-muted">
+          카메라를 시작하면 현재 카메라의 보정값을 설정할 수 있습니다.
+        </p>
       ) : (
         <div className="space-y-3 p-3">
           <div>
             <Row
               k="현재 카메라"
-              v={deviceDisplayName(active, Math.max(0, devices.findIndex((d) => d.deviceId === active.deviceId)))}
+              v={deviceDisplayName(
+                active,
+                Math.max(
+                  0,
+                  devices.findIndex((d) => d.deviceId === active.deviceId),
+                ),
+              )}
               sub={saved ? '저장된 보정' : '기본값'}
             />
             {active.label ? <Row k="장치명" v={<span className="text-[11.5px]">{active.label}</span>} /> : null}
@@ -89,7 +104,9 @@ export function CameraSettings() {
               unit="mm"
               min={5}
               max={300}
-              value={Number.isFinite(form.hfovLongDeg) ? Math.round(hfovToFocal35(form.hfovLongDeg) * 10) / 10 : undefined}
+              value={
+                Number.isFinite(form.hfovLongDeg) ? Math.round(hfovToFocal35(form.hfovLongDeg) * 10) / 10 : undefined
+              }
               hint="입력 시 화각 자동 계산"
               onChange={(v) => {
                 if (v != null && Number.isFinite(v) && v >= 5 && v <= 300)
@@ -101,7 +118,9 @@ export function CameraSettings() {
             <span className="text-[12.5px]">
               기기 기울기 센서 사용
               <span className="block text-[10.5px] text-muted">
-                {sensorPitch != null ? `현재 측정 기울기 ${fmtDeg(sensorPitch)} (아래+)` : '센서 값 없음 · 기본 기울기 사용'}
+                {sensorPitch != null
+                  ? `현재 측정 기울기 ${fmtDeg(sensorPitch)} (아래+)`
+                  : '센서 값 없음 · 기본 기울기 사용'}
               </span>
             </span>
             <input
@@ -112,8 +131,8 @@ export function CameraSettings() {
             />
           </label>
           <p className="text-[10.5px] leading-snug text-muted">
-            화각은 영상 긴 변 기준입니다. 카메라 높이는 바닥 접지 기반 거리 추정에, 거리 추정 기준 배율은 이 카메라의 모든
-            추정 거리에 곱해집니다. 이 카메라(렌즈)에만 저장됩니다.
+            화각은 영상 긴 변 기준입니다. 카메라 높이는 바닥 접지 기반 거리 추정에, 거리 추정 기준 배율은 이 카메라의
+            모든 추정 거리에 곱해집니다. 이 카메라(렌즈)에만 저장됩니다.
           </p>
           <div className="flex gap-2">
             <Button

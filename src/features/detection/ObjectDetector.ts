@@ -1,14 +1,34 @@
 import type { ObjectDetection } from '@tensorflow-models/coco-ssd';
 import type { Detection } from '../../types';
-import { getModelDefinition, initBackend, resolveModelUrl, type ModelDefinition } from './ModelLoader';
+import {
+  getModelDefinition,
+  initBackend,
+  onWebglContextLost,
+  resetWebglBackend,
+  resolveModelUrl,
+  type BackendPreference,
+  type ModelDefinition,
+} from './ModelLoader';
 
 /** 모델 교체가 가능하도록 분리한 객체 인식기 인터페이스 */
 export interface ObjectDetector {
   readonly model: ModelDefinition;
   readonly backend: string;
+  /** GPU 컨텍스트 손실 등으로 더 이상 추론할 수 없으면 true (다시 불러와야 함) */
+  readonly broken: boolean;
   detect(source: HTMLVideoElement | HTMLCanvasElement, options?: DetectOptions): Promise<Detection[]>;
   dispose(): void;
 }
+
+export interface DetectorCreateOptions {
+  backend?: BackendPreference;
+  /** WebGL 백엔드를 새 컨텍스트로 다시 만든 뒤 불러오기 (컨텍스트 손실 복구) */
+  resetGpu?: boolean;
+  onProgress?: (msg: string) => void;
+}
+
+/** 인식기 생성 함수 (파이프라인에 주입해 교체·테스트 가능) */
+export type DetectorFactory = (modelId: string, options?: DetectorCreateOptions) => Promise<ObjectDetector>;
 
 export interface DetectOptions {
   maxDetections?: number;
@@ -22,16 +42,29 @@ function sourceSize(source: HTMLVideoElement | HTMLCanvasElement) {
 
 /** TensorFlow.js COCO-SSD 기반 구현 (80개 COCO 클래스) */
 export class CocoSsdDetector implements ObjectDetector {
+  private contextLost = false;
+  private readonly unwatch: () => void;
+
   private constructor(
     readonly model: ModelDefinition,
     readonly backend: string,
     private readonly net: ObjectDetection,
-  ) {}
+  ) {
+    this.unwatch = onWebglContextLost(() => {
+      this.contextLost = true;
+    });
+  }
 
-  static async create(modelId: string, onProgress?: (msg: string) => void): Promise<CocoSsdDetector> {
+  get broken(): boolean {
+    return this.contextLost;
+  }
+
+  static async create(modelId: string, options: DetectorCreateOptions = {}): Promise<CocoSsdDetector> {
+    const { onProgress } = options;
     const def = getModelDefinition(modelId);
     onProgress?.('연산 백엔드 초기화');
-    const backend = await initBackend();
+    if (options.resetGpu && !resetWebglBackend()) throw new Error('WebGL 백엔드를 다시 만들 수 없습니다.');
+    const backend = await initBackend(options.backend);
     onProgress?.('모델 불러오는 중');
     const cocoSsd = await import('@tensorflow-models/coco-ssd');
     const url = await resolveModelUrl(def);
@@ -65,7 +98,12 @@ export class CocoSsdDetector implements ObjectDetector {
   }
 
   dispose(): void {
-    this.net.dispose();
+    this.unwatch();
+    try {
+      this.net.dispose();
+    } catch {
+      // 컨텍스트가 손실된 백엔드의 텐서는 해제에 실패할 수 있음
+    }
   }
 }
 

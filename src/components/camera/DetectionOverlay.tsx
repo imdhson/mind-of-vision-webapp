@@ -117,7 +117,13 @@ export function DetectionOverlay() {
       const active = useCameraStore.getState().active;
       if (!active) return;
       const bounds = canvas.getBoundingClientRect();
-      const rect = fitRect(bounds.width, bounds.height, active.videoWidth, active.videoHeight, useUIStore.getState().fitMode);
+      const rect = fitRect(
+        bounds.width,
+        bounds.height,
+        active.videoWidth,
+        active.videoHeight,
+        useUIStore.getState().fitMode,
+      );
       const nx = (e.clientX - bounds.left - rect.x) / rect.width;
       const ny = (e.clientY - bounds.top - rect.y) / rect.height;
       // 손가락 터치 여유(약 16px)

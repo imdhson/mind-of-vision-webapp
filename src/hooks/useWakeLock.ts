@@ -40,7 +40,7 @@ export function useWakeLock(active: boolean): WakeLockStatus {
         setStatus('active');
         s.addEventListener('release', () => {
           if (sentinel.current === s) sentinel.current = null;
-          if (!cancelled) setStatus('inactive');
+          setStatus('inactive');
         });
       } catch {
         if (!cancelled) setStatus('error');
@@ -52,10 +52,7 @@ export function useWakeLock(active: boolean): WakeLockStatus {
     };
 
     if (active) void request();
-    else {
-      void release();
-      setStatus('inactive');
-    }
+    else void release();
     document.addEventListener('visibilitychange', onVisibility);
     return () => {
       cancelled = true;
@@ -64,5 +61,7 @@ export function useWakeLock(active: boolean): WakeLockStatus {
     };
   }, [active, supported]);
 
-  return status;
+  // 비활성 상태는 입력값에서 바로 결정(해제 완료 이벤트를 기다리지 않음)
+  if (!supported) return 'unsupported';
+  return active ? status : 'inactive';
 }

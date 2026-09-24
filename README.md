@@ -157,7 +157,7 @@ PWA·카메라를 위해 **반드시 HTTPS 로 배포**하세요.
 
 ### GitHub Pages 자동 배포
 
-`.github/workflows/deploy-pages.yml` 이 기본 브랜치에 push 될 때마다 테스트·빌드 후 GitHub Pages(HTTPS)에 배포합니다.
+`.github/workflows/deploy-pages.yml` 이 `main` 브랜치에 push(병합) 될 때만 테스트·빌드 후 GitHub Pages(HTTPS)에 배포합니다.
 
 1. 저장소 **Settings → Pages → Build and deployment → Source** 를 **GitHub Actions** 로 설정 (최초 1회)
 2. **Actions** 탭에서 "Deploy to GitHub Pages" 를 다시 실행하거나 새 커밋을 push
@@ -294,6 +294,9 @@ PWA·카메라를 위해 **반드시 HTTPS 로 배포**하세요.
 - COCO 에는 "책상" 클래스가 없어 책상·식탁은 **테이블/책상**(dining table)으로 인식됩니다. "모니터"는 **TV/모니터**(tv)입니다.
 - WebGL 이 없는 환경에서는 CPU 로 추론하므로 매우 느리고, 3D 탭은 표시되지 않습니다(설정 탭 목록으로 확인 가능).
 - WebGPU 백엔드는 포함하지 않았습니다(WebGL 이 AMD 내장 그래픽을 포함한 대부분의 기기에서 가장 안정적).
+- 추론이 연속 3회 실패하거나 WebGL 컨텍스트가 손실되면(iOS 에서 앱을 백그라운드로 보냈다 돌아올 때 흔함) 먼저 WebGL 을
+  새로 만들어 모델을 다시 불러오고, 그래도 실패하면 CPU 로 전환합니다. 복구가 반복해서 실패하면 추론을 멈추고 새로고침을 안내합니다.
+- 백그라운드 전환으로 OS 가 카메라를 회수하면, 앱으로 돌아왔을 때 다른 카메라로 바꾸지 않고 쓰던 카메라를 다시 엽니다.
 
 ---
 
@@ -302,14 +305,18 @@ PWA·카메라를 위해 **반드시 HTTPS 로 배포**하세요.
 ```bash
 npm test            # 단위 테스트 (Vitest + jsdom + fake-indexeddb)
 npm run typecheck   # TypeScript 타입 검사
+npm run lint        # Oxlint (React Hooks 규칙 포함. TypeScript 7 은 typescript-eslint 가 지원하지 않아 Oxlint 사용)
+npm run format      # Prettier 로 코드 정리 (CI 는 format:check 로 확인)
 npm run build && npm run test:e2e   # E2E (Chromium + 실제 모델 + 가짜 카메라 영상)
 ```
 
 **단위 테스트** (`tests/unit`): 추적기(ID 유지, 동일 클래스 구분, 교차 클래스 매칭 금지, 유예/종료), 거리 추정(핀홀,
 실제 크기, 바닥 접지, 잘림, 배율), 보정 우선순위(실측 > 오프셋), 좌표 변환(피치 포함 왕복), 보정 합성·검증,
 IndexedDB 영속성(재실행 시뮬레이션, 자동 연결 금지, 잘못된 값 차단, 카메라별 독립), 자동 확대·축소(지연·최대 변화율·
-히스테리시스·유지), 방향 추정(이동/정지/잡음/사용자 지정), 렌즈 판별, 기울기 계산, 이동 궤적(최소 이동 거리·만료·
-개수 제한·추적 종료 시 즉시 삭제), 근접 경고(구역 진입 시 1회 경고·쿨다운·재진입 즉시 재경고·확정 전/종료된 추적 제외).
+히스테리시스·유지), 방향 추정(이동/정지/잡음/사용자 지정), 렌즈 판별, 기울기 계산, 처리 파이프라인(이전 스트림 결과 폐기,
+추론 실패 시 WebGL 재생성 → CPU 전환 → 포기), 카메라 관리자(전환 실패 복구, 겹친 요청, 연결 끊김, 백그라운드 복귀),
+이동 궤적(최소 이동 거리·만료·개수 제한·추적 종료 시 즉시 삭제), 근접 경고(구역 진입 시 1회 경고·쿨다운·재진입 즉시
+재경고·확정 전/종료된 추적 제외).
 
 **E2E** (`tests/e2e/smoke.mjs`): Chromium 가짜 카메라에 실제 사진(강아지 2마리)을 넣고 실제 COCO-SSD 로
 카메라 시작 → 인식 → 동일 클래스 2개 개별 ID → 거리/좌표 → 카메라 화면 클릭 선택 → 실제 거리 보정 저장·반영 →

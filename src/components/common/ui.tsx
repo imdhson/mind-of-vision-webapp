@@ -1,4 +1,4 @@
-import { useEffect, useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import { useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
 
 export function cx(...c: (string | false | null | undefined)[]) {
   return c.filter(Boolean).join(' ');
@@ -110,14 +110,16 @@ export function NumberField({
   id?: string;
 }) {
   const [text, setText] = useState(value == null ? '' : String(value));
-  // 외부에서 값이 바뀐 경우(초기화·단위 변경 등)에만 입력 문자열 동기화
-  useEffect(() => {
-    if (value != null && Number.isNaN(value)) return;
-    setText((prev) => {
-      const parsed = prev.trim() === '' ? undefined : Number(prev);
-      return parsed === value ? prev : value == null ? '' : String(value);
-    });
-  }, [value]);
+  // 외부에서 값이 바뀐 경우(초기화·단위 변경 등)에만 입력 문자열 동기화.
+  // 입력 중인 문자열이 같은 수를 뜻하면("1." → 1) 그대로 둬 커서·입력이 끊기지 않게 함
+  const [prevValue, setPrevValue] = useState(value);
+  if (!Object.is(value, prevValue)) {
+    setPrevValue(value);
+    if (value == null || !Number.isNaN(value)) {
+      const parsed = text.trim() === '' ? undefined : Number(text);
+      if (parsed !== value) setText(value == null ? '' : String(value));
+    }
+  }
   return (
     <label className="block" htmlFor={id}>
       <div className="mb-1 flex items-baseline justify-between gap-2">

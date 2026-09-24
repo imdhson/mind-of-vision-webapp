@@ -96,7 +96,11 @@ describe('ProximityMonitor', () => {
     const m = new ProximityMonitor();
     const config = { ...DEFAULT_PROXIMITY_CONFIG, distanceM: 1.5 };
     const alerts = m.evaluate(
-      [obj({ id: 'a', correctedDistance: 1.0 }), obj({ id: 'b', correctedDistance: 5 }), obj({ id: 'c', correctedDistance: 0.5 })],
+      [
+        obj({ id: 'a', correctedDistance: 1.0 }),
+        obj({ id: 'b', correctedDistance: 5 }),
+        obj({ id: 'c', correctedDistance: 0.5 }),
+      ],
       0,
       config,
     );

@@ -18,7 +18,7 @@ interface OpenRequest {
   facingMode?: 'environment' | 'user';
 }
 
-class CameraManagerImpl {
+export class CameraManagerImpl {
   readonly video: HTMLVideoElement;
   private stream: MediaStream | null = null;
   private requestSeq = 0;
@@ -274,6 +274,17 @@ class CameraManagerImpl {
       generation: this.store.generation + 1,
       error: { code: 'disconnected', message: '카메라 연결이 끊어졌습니다. 다른 카메라를 선택하거나 다시 시도하세요.' },
     });
+    if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
+      // 백그라운드 전환으로 OS 가 카메라를 회수한 경우(iOS·Android): 다른 카메라로 바꾸지 않고
+      // 앱으로 돌아왔을 때 같은 카메라를 다시 엽니다. 그 사이 사용자가 종료했다면 열지 않습니다.
+      const resume = () => {
+        if (document.visibilityState !== 'visible') return;
+        document.removeEventListener('visibilitychange', resume);
+        if (this.store.status === 'error' && !this.store.active) void (prevId ? this.switchTo(prevId) : this.start());
+      };
+      document.addEventListener('visibilitychange', resume);
+      return;
+    }
     // 다른 장치가 있으면 자동 복구 시도
     void this.refreshDevices().then((devices) => {
       const alt = devices.find((d) => d.deviceId !== prevId);

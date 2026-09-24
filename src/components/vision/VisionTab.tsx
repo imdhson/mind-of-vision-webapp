@@ -5,7 +5,12 @@ import { useCalibrationStore } from '../../stores/calibrationStore';
 import { useObjectStore } from '../../stores/objectStore';
 import { VisionScene } from '../../features/visualization/VisionScene';
 import { DARK_PALETTE, LIGHT_PALETTE } from '../../features/visualization/palette';
-import { computeIntrinsics, createDefaultProfile, profileKey, zoomFactorOf } from '../../features/camera/CameraCalibration';
+import {
+  computeIntrinsics,
+  createDefaultProfile,
+  profileKey,
+  zoomFactorOf,
+} from '../../features/camera/CameraCalibration';
 import { SelectedObjectSheet } from '../objects/SelectedObjectSheet';
 import { OverlayButton } from '../common/ui';
 import { IconHome } from '../common/Icons';
@@ -25,7 +30,7 @@ export default function VisionTab({ active }: { active: boolean }) {
   const palette = theme === 'dark' ? DARK_PALETTE : LIGHT_PALETTE;
   const [autoMode, setAutoMode] = useState(true);
   const [resetToken, setResetToken] = useState(0);
-  const webgl = useMemo(hasWebGL, []);
+  const [webgl] = useState(hasWebGL);
   const count = useObjectStore((s) => s.order.length);
   const hfovRad = useHorizontalFov();
 
@@ -80,7 +85,12 @@ function useHorizontalFov(): number | null {
   return useMemo(() => {
     if (!active || !active.videoWidth) return null;
     const profile = profiles[profileKey(active.deviceId)] ?? createDefaultProfile(active);
-    const K = computeIntrinsics(profile, active.videoWidth, active.videoHeight, zoomFactorOf(active.currentZoom, active.zoom?.min ?? null));
+    const K = computeIntrinsics(
+      profile,
+      active.videoWidth,
+      active.videoHeight,
+      zoomFactorOf(active.currentZoom, active.zoom?.min ?? null),
+    );
     return 2 * Math.atan(active.videoWidth / 2 / K.fx);
   }, [active, profiles]);
 }

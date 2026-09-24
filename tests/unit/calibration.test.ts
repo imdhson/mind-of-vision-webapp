@@ -8,7 +8,12 @@ import {
 } from '../../src/features/calibration/CalibrationManager';
 import type { ClassCalibration, InstanceCalibration } from '../../src/types';
 
-const cls = (values: ClassCalibration['values']): ClassCalibration => ({ id: 'class:cup', classId: 'cup', values, updatedAt: 0 });
+const cls = (values: ClassCalibration['values']): ClassCalibration => ({
+  id: 'class:cup',
+  classId: 'cup',
+  values,
+  updatedAt: 0,
+});
 const inst = (values: InstanceCalibration['values']): InstanceCalibration => ({
   id: 'inst:1',
   classId: 'cup',

@@ -66,10 +66,14 @@ async function ensureFixture(browser) {
 }
 
 function startServer() {
-  const proc = spawn(process.execPath, [join(ROOT, 'node_modules', 'vite', 'bin', 'vite.js'), 'preview', '--port', String(PORT), '--strictPort'], {
-    cwd: ROOT,
-    stdio: ['ignore', 'pipe', 'pipe'],
-  });
+  const proc = spawn(
+    process.execPath,
+    [join(ROOT, 'node_modules', 'vite', 'bin', 'vite.js'), 'preview', '--port', String(PORT), '--strictPort'],
+    {
+      cwd: ROOT,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    },
+  );
   return new Promise((resolve, reject) => {
     const t = setTimeout(() => reject(new Error('preview 서버 시작 시간 초과')), 20000);
     proc.stdout.on('data', (d) => {
@@ -111,24 +115,46 @@ async function main() {
     await page.goto(`${BASE}?debug=1`);
 
     // 1) 카메라 자동 시작 + 실제 인식
-    await page.waitForFunction(() => window.__movDebug?.camera.getState().status === 'running', null, { timeout: 30000 });
+    await page.waitForFunction(() => window.__movDebug?.camera.getState().status === 'running', null, {
+      timeout: 30000,
+    });
     check('카메라 스트림 시작', true);
-    await page.waitForFunction(() => window.__movDebug.objects.getState().detectorStatus === 'ready', null, { timeout: 120000 });
+    await page.waitForFunction(() => window.__movDebug.objects.getState().detectorStatus === 'ready', null, {
+      timeout: 120000,
+    });
     const backend = await page.evaluate(() => window.__movDebug.objects.getState().stats.backend);
     check('AI 모델 로드', true, `backend=${backend}`);
     await page.waitForFunction(
-      () => Object.values(window.__movDebug.objects.getState().objects).filter((o) => o.classId === 'dog' && o.trackingState === 'tracking').length >= 2,
+      () =>
+        Object.values(window.__movDebug.objects.getState().objects).filter(
+          (o) => o.classId === 'dog' && o.trackingState === 'tracking',
+        ).length >= 2,
       null,
       { timeout: 60000 },
     );
     const objs = await page.evaluate(() => Object.values(window.__movDebug.objects.getState().objects));
     const dogs = objs.filter((o) => o.classId === 'dog');
-    check('같은 종류 객체 2개를 서로 다른 ID로 추적', new Set(dogs.map((d) => d.id)).size === 2, dogs.map((d) => `${d.label}(${d.id})`).join(', '));
-    check('거리·3D 좌표 추정', dogs.every((d) => d.estimatedDistance > 0 && d.position), dogs.map((d) => `${d.label}=${d.estimatedDistance.toFixed(2)}m`).join(', '));
-    const ids1 = dogs.map((d) => d.id).sort().join();
+    check(
+      '같은 종류 객체 2개를 서로 다른 ID로 추적',
+      new Set(dogs.map((d) => d.id)).size === 2,
+      dogs.map((d) => `${d.label}(${d.id})`).join(', '),
+    );
+    check(
+      '거리·3D 좌표 추정',
+      dogs.every((d) => d.estimatedDistance > 0 && d.position),
+      dogs.map((d) => `${d.label}=${d.estimatedDistance.toFixed(2)}m`).join(', '),
+    );
+    const ids1 = dogs
+      .map((d) => d.id)
+      .sort()
+      .join();
     await page.waitForTimeout(3000);
     const ids2 = await page.evaluate(() =>
-      Object.values(window.__movDebug.objects.getState().objects).filter((o) => o.classId === 'dog').map((o) => o.id).sort().join(),
+      Object.values(window.__movDebug.objects.getState().objects)
+        .filter((o) => o.classId === 'dog')
+        .map((o) => o.id)
+        .sort()
+        .join(),
     );
     check('3초 동안 추적 ID 유지', ids1 === ids2, `${ids1} → ${ids2}`);
     await page.screenshot({ path: join(OUT, '01-camera.png') });
@@ -156,12 +182,15 @@ async function main() {
     await page.getByRole('radio', { name: '이 객체 · 저장' }).click();
     await page.locator(`#cal-${target.id}-measuredDistance`).fill('2.5');
     await page.getByTestId('calibration-save').click();
-    await page.waitForFunction(() => /저장됨/.test(document.querySelector('[data-testid="calibration-status"]')?.textContent ?? ''));
+    await page.waitForFunction(() =>
+      /저장됨/.test(document.querySelector('[data-testid="calibration-status"]')?.textContent ?? ''),
+    );
     await page.waitForTimeout(400);
     const after = await page.evaluate((id) => window.__movDebug.objects.getState().objects[id], target.id);
     check(
       '실제 거리 보정 저장 및 반영',
-      Math.abs(after.correctedDistance - 2.5) < 0.2 && Math.abs(after.estimatedDistance - target.estimatedDistance) < 0.5,
+      Math.abs(after.correctedDistance - 2.5) < 0.2 &&
+        Math.abs(after.estimatedDistance - target.estimatedDistance) < 0.5,
       `추정 ${after.estimatedDistance.toFixed(2)} → 보정 ${after.correctedDistance.toFixed(2)}`,
     );
     const hDist = Math.hypot(after.cameraPosition.x, after.cameraPosition.y, after.cameraPosition.z);
@@ -175,7 +204,9 @@ async function main() {
     await page.getByRole('radio', { name: '모든 강아지' }).click();
     await page.locator(`#cal-${target.id}-realHeight`).fill('0.4');
     await page.getByTestId('calibration-save').click();
-    await page.waitForFunction(() => /저장됨/.test(document.querySelector('[data-testid="calibration-status"]')?.textContent ?? ''));
+    await page.waitForFunction(() =>
+      /저장됨/.test(document.querySelector('[data-testid="calibration-status"]')?.textContent ?? ''),
+    );
     await page.screenshot({ path: join(OUT, '02-camera-calibration.png') });
 
     // 4) 3D 탭: 선택 동기화 + 3D 클릭 선택
@@ -224,7 +255,13 @@ async function main() {
     const lastId = await page.evaluate(() => window.__movDebug.objects.getState().order.at(-1));
     await page.evaluate((id) => window.__movDebug.objects.getState().select(id), lastId);
     await page.waitForTimeout(1200);
-    const firstAria = await page.getByTestId('object-list').locator('li').first().locator('button').first().getAttribute('aria-expanded');
+    const firstAria = await page
+      .getByTestId('object-list')
+      .locator('li')
+      .first()
+      .locator('button')
+      .first()
+      .getAttribute('aria-expanded');
     check('선택 객체 최상단 고정', firstAria === 'true', firstAria);
     await page.evaluate(() => window.__movDebug.objects.getState().select(null));
     const hasCameraSettings = await page.getByText('카메라 설정 · 보정').isVisible();
@@ -236,20 +273,28 @@ async function main() {
     await page.waitForFunction(() => window.__movDebug?.calibration.getState().loaded, null, { timeout: 20000 });
     const persisted = await page.evaluate(() => {
       const s = window.__movDebug.calibration.getState();
-      return { classes: Object.keys(s.classCals), instances: Object.values(s.instances).map((i) => i.name), bindings: s.bindings };
+      return {
+        classes: Object.keys(s.classCals),
+        instances: Object.values(s.instances).map((i) => i.name),
+        bindings: s.bindings,
+      };
     });
     check(
       '새로고침 후 보정값 유지',
       persisted.classes.includes('class:dog') && persisted.instances.length === 1,
       JSON.stringify(persisted.instances),
     );
-    await page.waitForFunction(() => Object.keys(window.__movDebug.objects.getState().objects).length > 0, null, { timeout: 60000 });
+    await page.waitForFunction(() => Object.keys(window.__movDebug.objects.getState().objects).length > 0, null, {
+      timeout: 60000,
+    });
     await page.waitForTimeout(800);
     const autoBound = await page.evaluate(() => Object.keys(window.__movDebug.calibration.getState().bindings).length);
     check('재실행 후 개별 보정 자동 적용 안 함(수동 연결 필요)', autoBound === 0);
     const sw = await page.evaluate(async () => !!(await navigator.serviceWorker?.getRegistration()));
     check('Service Worker 등록', sw);
-    const manifest = await page.evaluate(async () => (await fetch(document.querySelector('link[rel=manifest]').href)).json());
+    const manifest = await page.evaluate(async () =>
+      (await fetch(document.querySelector('link[rel=manifest]').href)).json(),
+    );
     check('Web App Manifest', manifest.display === 'standalone' && manifest.icons.length >= 3, manifest.name);
 
     // 7) 다크 모드 + 모바일 레이아웃
@@ -271,20 +316,27 @@ async function main() {
     });
     const m = await mobile.newPage();
     await m.goto(`${BASE}?debug=1`);
-    await m.waitForFunction(() => Object.keys(window.__movDebug?.objects.getState().objects ?? {}).length >= 2, null, { timeout: 120000 });
+    await m.waitForFunction(() => Object.keys(window.__movDebug?.objects.getState().objects ?? {}).length >= 2, null, {
+      timeout: 120000,
+    });
     await m.waitForTimeout(1000);
     await m.screenshot({ path: join(OUT, '07-mobile-camera.png') });
     const headerH = await m.evaluate(() => document.querySelector('header').getBoundingClientRect().height);
     const navH = await m.evaluate(() => document.querySelector('nav').getBoundingClientRect().height);
     check('얇은 헤더/하단 탭', headerH <= 36 && navH <= 56, `header ${headerH}px, tabs ${navH}px`);
     // 터치로 선택
-    const mid = await m.evaluate(() => Object.values(window.__movDebug.objects.getState().objects).find((o) => o.classId === 'dog')?.id);
+    const mid = await m.evaluate(
+      () => Object.values(window.__movDebug.objects.getState().objects).find((o) => o.classId === 'dog')?.id,
+    );
     const mpt = await m.evaluate((id) => {
       const o = window.__movDebug.objects.getState().objects[id];
       const cam = window.__movDebug.camera.getState().active;
       const r = document.querySelector('[data-testid="detection-overlay"]').getBoundingClientRect();
       const s = Math.min(r.width / cam.videoWidth, r.height / cam.videoHeight);
-      return { x: r.left + (r.width - cam.videoWidth * s) / 2 + o.center.x * cam.videoWidth * s, y: r.top + (r.height - cam.videoHeight * s) / 2 + o.center.y * cam.videoHeight * s };
+      return {
+        x: r.left + (r.width - cam.videoWidth * s) / 2 + o.center.x * cam.videoWidth * s,
+        y: r.top + (r.height - cam.videoHeight * s) / 2 + o.center.y * cam.videoHeight * s,
+      };
     }, mid);
     await m.touchscreen.tap(mpt.x, mpt.y);
     await m.waitForTimeout(300);
@@ -306,7 +358,11 @@ async function main() {
       status: window.__movDebug.camera.getState().status,
       n: Object.keys(window.__movDebug.objects.getState().objects).length,
     }));
-    check('카메라 종료 시 스트림·추적 정리', afterStop.status === 'idle' && afterStop.n === 0, JSON.stringify(afterStop));
+    check(
+      '카메라 종료 시 스트림·추적 정리',
+      afterStop.status === 'idle' && afterStop.n === 0,
+      JSON.stringify(afterStop),
+    );
   } finally {
     await browser.close();
     server.kill();

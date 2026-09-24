@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useSelectedObject } from '../../hooks/useSelectedObject';
 import { useObjectStore } from '../../stores/objectStore';
 import { useUIStore } from '../../stores/uiStore';
@@ -21,10 +21,12 @@ export function SelectedObjectSheet({ context }: { context: 'camera' | 'vision' 
   const tab = useUIStore((s) => s.tab);
   const [view, setView] = useState<View>('summary');
   const objectId = object?.id ?? null;
-
-  useEffect(() => {
+  const [prevObjectId, setPrevObjectId] = useState(objectId);
+  // 선택이 해제되면 다음 선택은 요약부터 (렌더 중 상태 조정: 효과보다 한 번 덜 렌더링)
+  if (objectId !== prevObjectId) {
+    setPrevObjectId(objectId);
     if (!objectId) setView('summary');
-  }, [objectId]);
+  }
 
   const visible = tab === context;
 

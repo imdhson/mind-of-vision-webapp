@@ -23,7 +23,12 @@ export function getDebugBridge(): DebugBridge | null {
   if (!debugEnabled) return null;
   const w = window as unknown as { __movDebug?: DebugBridge };
   if (!w.__movDebug) {
-    w.__movDebug = { objects: useObjectStore, calibration: useCalibrationStore, camera: useCameraStore, ui: useUIStore };
+    w.__movDebug = {
+      objects: useObjectStore,
+      calibration: useCalibrationStore,
+      camera: useCameraStore,
+      ui: useUIStore,
+    };
   }
   return w.__movDebug;
 }

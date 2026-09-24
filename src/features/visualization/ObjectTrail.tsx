@@ -1,7 +1,8 @@
-import { memo, useEffect, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { BufferAttribute, BufferGeometry, Float32BufferAttribute, Line, LineBasicMaterial } from 'three';
 import { useObjectStore } from '../../stores/objectStore';
+import { useDisposableRef, useMutableRef } from '../../hooks/useDisposableRef';
 import { DEFAULT_TRAIL_CONFIG } from './TrailTracker';
 import type { ScenePalette } from './palette';
 
@@ -29,22 +30,20 @@ export const ObjectTrail = memo(function ObjectTrail({ id, palette }: { id: stri
     return l;
   }, [geometry, material]);
 
-  useEffect(
-    () => () => {
-      geometry.dispose();
-      material.dispose();
-    },
-    [geometry, material],
-  );
+  const geometryRef = useDisposableRef(geometry);
+  useDisposableRef(material);
+  const lineRef = useMutableRef(line);
 
   useFrame(() => {
+    const l = lineRef.current;
     const trail = useObjectStore.getState().trails[id];
     if (!trail || trail.length < 2) {
-      line.visible = false;
+      l.visible = false;
       return;
     }
-    line.visible = true;
-    const attr = geometry.getAttribute('position') as BufferAttribute;
+    l.visible = true;
+    const g = geometryRef.current;
+    const attr = g.getAttribute('position') as BufferAttribute;
     const n = Math.min(trail.length, DEFAULT_TRAIL_CONFIG.maxPoints);
     const start = trail.length - n;
     for (let i = 0; i < n; i++) {
@@ -52,7 +51,7 @@ export const ObjectTrail = memo(function ObjectTrail({ id, palette }: { id: stri
       attr.setXYZ(i, p.x, TRAIL_Y, p.z);
     }
     attr.needsUpdate = true;
-    geometry.setDrawRange(0, n);
+    g.setDrawRange(0, n);
   });
 
   return <primitive object={line} />;

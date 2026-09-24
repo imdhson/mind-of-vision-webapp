@@ -12,6 +12,7 @@ import {
   type Mesh,
 } from 'three';
 import { useObjectStore } from '../../stores/objectStore';
+import { useDisposableRef } from '../../hooks/useDisposableRef';
 import { getClassInfo } from '../detection/classCatalog';
 import { clamp, dampFactor, lerpAngle } from '../../utils/math';
 import { fmtDistance } from '../../utils/format';
@@ -66,15 +67,37 @@ export const ObjectMesh = memo(function ObjectMesh({
     [palette.object],
   );
   const ringMat = useMemo(
-    () => new MeshBasicMaterial({ color: palette.ring, transparent: true, opacity: 0.5, side: DoubleSide, depthWrite: false }),
+    () =>
+      new MeshBasicMaterial({
+        color: palette.ring,
+        transparent: true,
+        opacity: 0.5,
+        side: DoubleSide,
+        depthWrite: false,
+      }),
     [palette.ring],
   );
   const arrowMat = useMemo(
-    () => new MeshBasicMaterial({ color: palette.selected, transparent: true, opacity: 0.85, depthWrite: false, side: DoubleSide }),
+    () =>
+      new MeshBasicMaterial({
+        color: palette.selected,
+        transparent: true,
+        opacity: 0.85,
+        depthWrite: false,
+        side: DoubleSide,
+      }),
     [palette.selected],
   );
-  const hitMat = useMemo(() => new MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, colorWrite: false }), []);
+  const hitMat = useMemo(
+    () => new MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, colorWrite: false }),
+    [],
+  );
   const tmpColor = useMemo(() => new Color(), []);
+  // 매 프레임 바꾸는 재질은 ref 로 접근(렌더 중 만든 값을 직접 변경하지 않음)
+  const materialRef = useDisposableRef(material);
+  const ringMatRef = useDisposableRef(ringMat);
+  useDisposableRef(arrowMat);
+  useDisposableRef(hitMat);
 
   useFrame((_, delta) => {
     const g = root.current;
@@ -138,17 +161,26 @@ export const ObjectMesh = memo(function ObjectMesh({
     }
 
     const selected = selectedId === id;
-    const targetOpacity = o.trackingState === 'temporarily_lost' ? 0.35 : o.trackingState === 'lost' ? 0.12 : o.trackingState === 'detected' ? 0.6 : 1;
+    const targetOpacity =
+      o.trackingState === 'temporarily_lost'
+        ? 0.35
+        : o.trackingState === 'lost'
+          ? 0.12
+          : o.trackingState === 'detected'
+            ? 0.6
+            : 1;
     s.opacity += (targetOpacity - s.opacity) * dampFactor(dt, 0.2);
-    material.opacity = s.opacity;
-    material.color.lerp(tmpColor.set(selected ? palette.selected : palette.object), dampFactor(dt, 0.12));
-    material.emissive.set(selected ? palette.selectedEmissive : '#000000');
+    const mat = materialRef.current;
+    mat.opacity = s.opacity;
+    mat.color.lerp(tmpColor.set(selected ? palette.selected : palette.object), dampFactor(dt, 0.12));
+    mat.emissive.set(selected ? palette.selectedEmissive : '#000000');
 
     if (ring.current) {
       const r = Math.max(0.16, Math.max(s.sx, s.sz) * 0.6);
       ring.current.scale.set(r, r, r);
-      ringMat.color.set(selected ? palette.selected : palette.ring);
-      ringMat.opacity = (selected ? 0.95 : 0.45) * s.opacity;
+      const rm = ringMatRef.current;
+      rm.color.set(selected ? palette.selected : palette.ring);
+      rm.opacity = (selected ? 0.95 : 0.45) * s.opacity;
     }
 
     if (facing.current) {

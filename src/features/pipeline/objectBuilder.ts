@@ -72,9 +72,7 @@ export function computeGeometry(track: TrackSnapshot, values: CalibrationValues,
   // → 비율의 기준은 항상 크기 보정 없는 원본 추정값
   const measured = values.measuredDistance != null;
   const hasSize = !measured && (values.realHeight != null || values.realWidth != null);
-  const sized = hasSize
-    ? (estimateDistance({ box: track.box, ...common, sizeOverride: values }) ?? raw)
-    : raw;
+  const sized = hasSize ? (estimateDistance({ box: track.box, ...common, sizeOverride: values }) ?? raw) : raw;
   const corrected = applyDistanceCorrection(sized.rawDistance, values);
 
   const rawCam = boxToCameraPoint(track.box, raw.rawDistance, ctx.intrinsics);

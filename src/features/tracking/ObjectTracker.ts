@@ -54,11 +54,11 @@ export interface TrackerInput {
   appearances?: (AppearanceSignature | null)[];
 }
 
-let globalCounter = 0;
-
 export class ObjectTracker {
   private tracks = new Map<string, InternalTrack>();
   private lastTimestamp: number | null = null;
+  /** reset() 후에도 이어지는 ID 순번: 이전 ID를 참조하던 선택 상태가 새 객체에 잘못 연결되지 않도록 함 */
+  private idCounter = 0;
   readonly config: TrackerConfig;
 
   constructor(config: Partial<TrackerConfig> = {}) {
@@ -139,7 +139,7 @@ export class ObjectTracker {
     // 4) 새 추적 생성
     detections.forEach((det, di) => {
       if (usedDets.has(di)) return;
-      const id = `trk-${++globalCounter}`;
+      const id = `trk-${++this.idCounter}`;
       this.tracks.set(id, {
         id,
         classId: det.classId,

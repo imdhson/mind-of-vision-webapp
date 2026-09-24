@@ -42,7 +42,12 @@ describe('estimateDistance', () => {
   it('uses user-provided real size', () => {
     const b = projected(0.2, 0.17, 2); // 실제로는 2배 큰 컵
     const withPrior = estimateDistance({ box: b, classInfo: cup, ...common })!;
-    const withSize = estimateDistance({ box: b, classInfo: cup, ...common, sizeOverride: { realHeight: 0.2, realWidth: 0.17 } })!;
+    const withSize = estimateDistance({
+      box: b,
+      classInfo: cup,
+      ...common,
+      sizeOverride: { realHeight: 0.2, realWidth: 0.17 },
+    })!;
     expect(withPrior.rawDepth).toBeLessThan(1.3);
     expect(withSize.rawDepth).toBeCloseTo(2, 1);
   });

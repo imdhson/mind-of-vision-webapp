@@ -77,8 +77,24 @@ export function AppSettings() {
             </button>
           ))}
           <div className="pt-1">
-            <Row k="상태" v={detectorStatus === 'ready' ? '준비됨' : detectorStatus === 'loading' ? '불러오는 중' : detectorStatus === 'error' ? '오류' : '대기'} sub={detectorMessage ?? undefined} />
-            <Row k="연산 백엔드" v={stats.backend ?? '—'} sub={stats.backend === 'cpu' ? 'GPU 미사용(느림)' : undefined} />
+            <Row
+              k="상태"
+              v={
+                detectorStatus === 'ready'
+                  ? '준비됨'
+                  : detectorStatus === 'loading'
+                    ? '불러오는 중'
+                    : detectorStatus === 'error'
+                      ? '오류'
+                      : '대기'
+              }
+              sub={detectorMessage ?? undefined}
+            />
+            <Row
+              k="연산 백엔드"
+              v={stats.backend ?? '—'}
+              sub={stats.backend === 'cpu' ? 'GPU 미사용(느림)' : undefined}
+            />
             <Row k="평균 추론 시간" v={stats.inferenceMs ? `${stats.inferenceMs.toFixed(0)} ms` : '—'} />
             <Row k="인식 주기" v={stats.detectionFps ? `${stats.detectionFps.toFixed(1)} 회/초` : '—'} />
           </div>
@@ -86,7 +102,11 @@ export function AppSettings() {
             인식 가능한 객체 {allClasses().length}종 {classes ? '접기' : '보기'}
           </button>
           {classes ? (
-            <p className="text-[11.5px] leading-relaxed text-muted">{allClasses().map((c) => c.nameKo).join(', ')}</p>
+            <p className="text-[11.5px] leading-relaxed text-muted">
+              {allClasses()
+                .map((c) => c.nameKo)
+                .join(', ')}
+            </p>
           ) : null}
         </div>
       </Section>
@@ -116,7 +136,12 @@ export function AppSettings() {
             onClick={async () => {
               if (!confirm('저장된 모든 카메라·객체 보정값을 삭제할까요? 되돌릴 수 없습니다.')) return;
               const r = await useCalibrationStore.getState().clearAll();
-              useUIStore.getState().toast(r.persisted ? '모든 보정값을 삭제했습니다' : (r.error ?? '삭제 실패'), r.persisted ? 'success' : 'error');
+              useUIStore
+                .getState()
+                .toast(
+                  r.persisted ? '모든 보정값을 삭제했습니다' : (r.error ?? '삭제 실패'),
+                  r.persisted ? 'success' : 'error',
+                );
             }}
           >
             모든 보정값 삭제
@@ -138,8 +163,8 @@ function Help() {
         추정값과의 비율로 저장되어, 객체가 움직여도 비율이 유지됩니다.
       </p>
       <p>
-        <b>저장 범위</b> · 임시(이번 추적만), 개별(이 물체 전용, 재실행 후 수동 연결), 클래스(같은 종류 전체). 우선순위는
-        임시 &gt; 개별 &gt; 클래스입니다.
+        <b>저장 범위</b> · 임시(이번 추적만), 개별(이 물체 전용, 재실행 후 수동 연결), 클래스(같은 종류 전체).
+        우선순위는 임시 &gt; 개별 &gt; 클래스입니다.
       </p>
       <p>
         <b>거리 추정의 한계</b> · 단일 카메라로는 절대 거리를 정확히 알 수 없습니다. 객체의 일반적인 크기, 카메라 화각,
@@ -154,8 +179,8 @@ function Help() {
         추정 거리를 기준으로 하므로 참고용으로만 사용하세요.
       </p>
       <p>
-        <b>방향</b> · 사람·동물·탈것은 이동할 때 이동 방향을 바라보는 방향으로 추정합니다. 정지한 물체의 방향은 알 수 없어
-        "미확인"으로 표시되며, 방향 보정으로 직접 지정할 수 있습니다.
+        <b>방향</b> · 사람·동물·탈것은 이동할 때 이동 방향을 바라보는 방향으로 추정합니다. 정지한 물체의 방향은 알 수
+        없어 "미확인"으로 표시되며, 방향 보정으로 직접 지정할 수 있습니다.
       </p>
       <p>
         <b>좌표</b> · 3D 공간은 카메라 기준 상대 좌표입니다. 휴대폰을 움직이거나 돌리면 공간도 함께 바뀝니다(자기 위치

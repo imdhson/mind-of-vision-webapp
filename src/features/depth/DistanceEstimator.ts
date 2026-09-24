@@ -102,9 +102,7 @@ export function estimateDistance(input: DistanceInput): DistanceEstimate | null 
 
   // 품질: 단서 간 일치도 × 잘림 × 크기 편차
   const tw = adjusted.reduce((s, c) => s + c.weight, 0);
-  const spread = Math.sqrt(
-    adjusted.reduce((s, c) => s + c.weight * (Math.log(c.distance) - logZ) ** 2, 0) / tw,
-  );
+  const spread = Math.sqrt(adjusted.reduce((s, c) => s + c.weight * (Math.log(c.distance) - logZ) ** 2, 0) / tw);
   const truncated = heightTruncated && widthTruncated ? true : heightTruncated || widthTruncated;
   let quality = Math.exp(-spread * 2);
   if (heightTruncated && widthTruncated) quality *= 0.3;

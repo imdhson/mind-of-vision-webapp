@@ -44,7 +44,16 @@ export const MOTION_STATE_KO: Record<MotionState, string> = {
 export function describeYaw(yaw: number | null): string {
   if (yaw == null) return UNKNOWN;
   const deg = ((((yaw * 180) / Math.PI) % 360) + 360) % 360;
-  const dirs = ['사용자 쪽', '사용자 쪽·오른쪽', '오른쪽', '먼 쪽·오른쪽', '먼 쪽', '먼 쪽·왼쪽', '왼쪽', '사용자 쪽·왼쪽'];
+  const dirs = [
+    '사용자 쪽',
+    '사용자 쪽·오른쪽',
+    '오른쪽',
+    '먼 쪽·오른쪽',
+    '먼 쪽',
+    '먼 쪽·왼쪽',
+    '왼쪽',
+    '사용자 쪽·왼쪽',
+  ];
   // yaw 는 Y축 반시계 회전: +Z(사용자 쪽)=0, +X(오른쪽)=+90°
   return `${dirs[Math.round(deg / 45) % 8]} (${Math.round(deg > 180 ? deg - 360 : deg)}°)`;
 }
