@@ -104,9 +104,9 @@ class VisionPipelineImpl {
       useCameraStore.subscribe((s, prev) => {
         if (s.generation !== prev.generation) {
           this.resetTracking();
-        } else if (s.active?.currentZoom !== prev.active?.currentZoom || s.sensorPitch !== prev.sensorPitch) {
-          // 센서 변화는 다음 추론 때 반영(과도한 재계산 방지). 줌은 즉시 반영
-          if (s.active?.currentZoom !== prev.active?.currentZoom) this.publish(false);
+        } else if (s.active?.currentZoom !== prev.active?.currentZoom) {
+          // 줌은 즉시 반영. 센서(기울기) 변화는 다음 추론 때 반영(과도한 재계산 방지)
+          this.publish(false);
         }
       }),
     );
@@ -244,19 +244,14 @@ class VisionPipelineImpl {
       const classCal = cal.classCals[`class:${track.classId}`];
       const instId = cal.bindings[track.id];
       const inst = instId ? cal.instances[instId] : undefined;
-      let sessionValues = cal.session[track.id];
-      if (cal.draft && cal.draft.trackId === track.id) {
-        // 미리보기: 입력 중 값은 해당 범위 계층에만 임시로 반영
-        if (cal.draft.scope === 'session') sessionValues = cal.draft.values;
-      }
+      // 미리보기: 입력 중 값은 해당 범위 계층에만 임시로 반영
+      const draft = cal.draft?.trackId === track.id ? cal.draft : null;
       const resolved = resolveCalibration(
-        cal.draft?.trackId === track.id && cal.draft.scope === 'class'
-          ? { id: 'draft', classId: track.classId, values: cal.draft.values, updatedAt: 0 }
+        draft?.scope === 'class'
+          ? { id: 'draft', classId: track.classId, values: draft.values, updatedAt: 0 }
           : classCal,
-        cal.draft?.trackId === track.id && cal.draft.scope === 'instance'
-          ? { ...(inst ?? emptyInstance(track.classId)), values: cal.draft.values }
-          : inst,
-        sessionValues,
+        draft?.scope === 'instance' ? { ...(inst ?? emptyInstance(track.classId)), values: draft.values } : inst,
+        draft?.scope === 'session' ? draft.values : cal.session[track.id],
       );
       if (!ctx) {
         list.push(

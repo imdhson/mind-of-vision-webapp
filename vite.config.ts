@@ -55,12 +55,16 @@ export default defineConfig(({ mode }) => {
     build: {
       target: 'es2020',
       chunkSizeWarningLimit: 2500,
-      rollupOptions: {
+      rolldownOptions: {
         output: {
-          manualChunks(id: string) {
-            if (id.includes('@tensorflow')) return 'tfjs';
-            if (id.includes('three') || id.includes('@react-three')) return 'three';
-            return undefined;
+          // 무거운 라이브러리를 별도 청크로 분리합니다. React 등 공용 모듈을 vendor 로 먼저(우선순위 높게)
+          // 묶어 두어야 three 청크에 섞이지 않고, 지연 로딩하는 3D 탭의 three.js 가 첫 화면에서 받아지지 않습니다.
+          codeSplitting: {
+            groups: [
+              { name: 'vendor', test: /[\\/]node_modules[\\/](react|react-dom|scheduler|zustand)[\\/]/, priority: 30 },
+              { name: 'tfjs', test: /[\\/]node_modules[\\/]@tensorflow(-models)?[\\/]/, priority: 20 },
+              { name: 'three', test: /[\\/]node_modules[\\/](three|three-stdlib|@react-three)[\\/]/, priority: 10 },
+            ],
           },
         },
       },
