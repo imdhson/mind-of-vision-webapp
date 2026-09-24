@@ -10,7 +10,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview --host",
     "typecheck": "tsc -b",
-    "lint": "oxlint",
+    "lint": "oxlint --deny-warnings",
     "format": "prettier --write \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,mjs}\" \"scripts/**/*.mjs\" \"*.ts\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,mjs}\" \"scripts/**/*.mjs\" \"*.ts\"",
     "test": "vitest run",
