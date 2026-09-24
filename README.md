@@ -153,6 +153,17 @@ npm run preview   # http://localhost:4173 에서 빌드 결과 확인 (--host �
 `dist/` 폴더를 정적 파일로 어떤 웹 서버에나 배포할 수 있습니다(`base: './'` 이므로 하위 경로 배포 가능).
 PWA·카메라를 위해 **반드시 HTTPS 로 배포**하세요.
 
+### GitHub Pages 자동 배포
+
+`.github/workflows/deploy-pages.yml` 이 기본 브랜치에 push 될 때마다 테스트·빌드 후 GitHub Pages(HTTPS)에 배포합니다.
+
+1. 저장소 **Settings → Pages → Build and deployment → Source** 를 **GitHub Actions** 로 설정 (최초 1회)
+2. **Actions** 탭에서 "Deploy to GitHub Pages" 를 다시 실행하거나 새 커밋을 push
+3. 배포 주소: `https://<사용자명>.github.io/<저장소명>/` — 스마트폰에서 바로 카메라 사용 가능
+
+비공개 저장소에서 Pages 를 쓰려면 GitHub Pro/Team 요금제가 필요합니다. 무료 계정이면 저장소를 공개로 바꾸거나
+`dist/` 를 Netlify Drop(https://app.netlify.com/drop) 등에 끌어다 놓아 배포할 수 있습니다.
+
 ---
 
 ## 6. 객체 인식 모델
