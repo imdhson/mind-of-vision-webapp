@@ -91,7 +91,9 @@ export function SavedCalibrations() {
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[13px] font-medium">
                       {i.name}
-                      <span className="ml-1.5 text-[11px] font-normal text-muted">{getClassInfo(i.classId).nameKo}</span>
+                      <span className="ml-1.5 text-[11px] font-normal text-muted">
+                        {getClassInfo(i.classId).nameKo}
+                      </span>
                     </div>
                     <div className="truncate text-[11px] text-muted">
                       {bound ? '연결됨 · ' : ''}
@@ -126,7 +128,9 @@ export function SavedCalibrations() {
                   <div className="mt-2 space-y-2">
                     <RenameField
                       initial={i.name}
-                      onSave={async (name) => report(await useCalibrationStore.getState().renameInstance(i.id, name), '이름을 바꿨습니다')}
+                      onSave={async (name) =>
+                        report(await useCalibrationStore.getState().renameInstance(i.id, name), '이름을 바꿨습니다')
+                      }
                     />
                     <ValuesEditor
                       initial={i.values}

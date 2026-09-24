@@ -66,14 +66,31 @@ export const ObjectMesh = memo(function ObjectMesh({
     [palette.object],
   );
   const ringMat = useMemo(
-    () => new MeshBasicMaterial({ color: palette.ring, transparent: true, opacity: 0.5, side: DoubleSide, depthWrite: false }),
+    () =>
+      new MeshBasicMaterial({
+        color: palette.ring,
+        transparent: true,
+        opacity: 0.5,
+        side: DoubleSide,
+        depthWrite: false,
+      }),
     [palette.ring],
   );
   const arrowMat = useMemo(
-    () => new MeshBasicMaterial({ color: palette.selected, transparent: true, opacity: 0.85, depthWrite: false, side: DoubleSide }),
+    () =>
+      new MeshBasicMaterial({
+        color: palette.selected,
+        transparent: true,
+        opacity: 0.85,
+        depthWrite: false,
+        side: DoubleSide,
+      }),
     [palette.selected],
   );
-  const hitMat = useMemo(() => new MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, colorWrite: false }), []);
+  const hitMat = useMemo(
+    () => new MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, colorWrite: false }),
+    [],
+  );
   const tmpColor = useMemo(() => new Color(), []);
 
   useFrame((_, delta) => {
@@ -138,7 +155,14 @@ export const ObjectMesh = memo(function ObjectMesh({
     }
 
     const selected = selectedId === id;
-    const targetOpacity = o.trackingState === 'temporarily_lost' ? 0.35 : o.trackingState === 'lost' ? 0.12 : o.trackingState === 'detected' ? 0.6 : 1;
+    const targetOpacity =
+      o.trackingState === 'temporarily_lost'
+        ? 0.35
+        : o.trackingState === 'lost'
+          ? 0.12
+          : o.trackingState === 'detected'
+            ? 0.6
+            : 1;
     s.opacity += (targetOpacity - s.opacity) * dampFactor(dt, 0.2);
     material.opacity = s.opacity;
     material.color.lerp(tmpColor.set(selected ? palette.selected : palette.object), dampFactor(dt, 0.12));

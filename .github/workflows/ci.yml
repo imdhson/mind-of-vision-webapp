@@ -1,4 +1,4 @@
-# PR 검사: 머지 전에 타입 검사·단위 테스트·빌드를 확인합니다. (배포는 deploy-pages.yml 이 main push 시 수행)
+# PR 검사: 머지 전에 린트·포맷·단위 테스트·빌드(타입 검사 포함)를 확인합니다. (배포는 deploy-pages.yml 이 main push 시 수행)
 name: CI
 
 on:
@@ -22,5 +22,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
       - run: npm test
       - run: npm run build

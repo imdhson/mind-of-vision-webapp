@@ -47,8 +47,10 @@ describe('ObjectTracker', () => {
     const cls = new Set(tracks.map((x) => x.classId));
     expect(cls.has('bottle')).toBe(true);
     const bottle = tracks.find((x) => x.classId === 'bottle')!;
+    // 확정 전 컵 추적은 유예 시간(400ms) 안이므로 남아 있고, 병과 섞이지 않아야 함
     const cup = tracks.find((x) => x.classId === 'cup');
-    if (cup) expect(cup.id).not.toBe(bottle.id);
+    expect(cup?.id).toBeDefined();
+    expect(cup?.id).not.toBe(bottle.id);
   });
 
   it('applies a grace period, then marks lost, then removes', () => {

@@ -45,13 +45,7 @@ export interface Size3 {
 }
 
 // ── 카메라 ────────────────────────────────────────────────────
-export type LensKind =
-  | 'ultra-wide'
-  | 'wide'
-  | 'telephoto'
-  | 'front'
-  | 'external'
-  | 'unknown';
+export type LensKind = 'ultra-wide' | 'wide' | 'telephoto' | 'front' | 'external' | 'unknown';
 
 export type FacingMode = 'environment' | 'user' | 'unknown';
 
