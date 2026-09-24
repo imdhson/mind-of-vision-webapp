@@ -4,7 +4,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [claude/session-ev6hqc, main]
+    branches: [claude/session-ev6hqc, claude/blissful-keller-34qg00, main]
   workflow_dispatch:
 
 permissions:

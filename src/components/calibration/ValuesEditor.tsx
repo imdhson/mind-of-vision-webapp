@@ -5,7 +5,7 @@ import { Button, NumberField } from '../common/ui';
 import { fmtMeters } from '../../utils/format';
 
 /**
- * 저장된 보정값 편집기 (객체 목록 탭 · 실시간 객체 없이 편집)
+ * 저장된 보정값 편집기 (설정 탭 · 실시간 객체 없이 편집)
  * 실제 거리는 실시간 객체의 추정값을 기준으로 기록해야 하므로 여기서는 삭제만 가능합니다.
  */
 export function ValuesEditor({

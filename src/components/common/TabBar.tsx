@@ -1,11 +1,11 @@
 import { useUIStore, type TabId } from '../../stores/uiStore';
-import { IconCamera, IconCube, IconList } from './Icons';
+import { IconCamera, IconCube, IconSliders } from './Icons';
 import { cx } from './ui';
 
 const TABS: { id: TabId; label: string; Icon: typeof IconCamera }[] = [
   { id: 'camera', label: '카메라', Icon: IconCamera },
   { id: 'vision', label: '3D 시각화', Icon: IconCube },
-  { id: 'objects', label: '객체 목록', Icon: IconList },
+  { id: 'objects', label: '설정', Icon: IconSliders },
 ];
 
 /** 하단 탭 (푸터 역할, 48px + 안전 영역) */

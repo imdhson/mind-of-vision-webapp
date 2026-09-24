@@ -36,7 +36,7 @@ export default function App() {
             </ErrorBoundary>
           </Panel>
           <Panel id="objects" active={tab === 'objects'}>
-            <ErrorBoundary name="객체 목록">
+            <ErrorBoundary name="설정">
               <ObjectsTab />
             </ErrorBoundary>
           </Panel>
