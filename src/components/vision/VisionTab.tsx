@@ -34,7 +34,7 @@ export default function VisionTab({ active }: { active: boolean }) {
       <div className="grid h-full place-items-center p-6 text-center">
         <div>
           <p className="text-[14px] font-medium">이 기기·브라우저에서 3D(WebGL)를 사용할 수 없습니다.</p>
-          <p className="mt-1 text-[12px] text-muted">객체 목록 탭에서 거리와 위치를 확인할 수 있습니다.</p>
+          <p className="mt-1 text-[12px] text-muted">설정 탭에서 거리와 위치를 확인할 수 있습니다.</p>
         </div>
       </div>
     );

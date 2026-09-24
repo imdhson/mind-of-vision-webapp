@@ -17,7 +17,7 @@ import { Button, NumberField, Row, Section } from '../common/ui';
 import { fmtDeg } from '../../utils/format';
 
 /**
- * 카메라(렌즈)별 보정 설정 — 객체 목록 탭에 배치
+ * 카메라(렌즈)별 보정 설정 — 설정 탭에 배치
  * 브라우저가 각 렌즈를 별도 장치로 제공하므로 장치별 프로파일 = 렌즈별 보정값입니다.
  * 저장한 값은 해당 카메라에만 적용되며 다른 카메라 설정을 덮어쓰지 않습니다.
  */

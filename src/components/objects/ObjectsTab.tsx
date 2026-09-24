@@ -10,10 +10,12 @@ import { CameraSettings } from '../calibration/CameraSettings';
 import { SavedCalibrations } from '../calibration/SavedCalibrations';
 import { AppSettings } from './AppSettings';
 
-/** 객체 목록 탭: 실시간 객체 목록 + 상세/보정 + 카메라 설정/보정 + 저장된 보정값 관리 */
+/** 설정 탭: 실시간 객체 목록 + 상세/보정 + 카메라 설정/보정 + 저장된 보정값 관리 */
 export function ObjectsTab() {
   const order = useObjectStore((s) => s.order);
   const selectedId = useObjectStore((s) => s.selectedId);
+  // 선택된 객체는 최상단에 고정 — 실시간 정렬 변화로 보정 중인 항목이 움직이지 않도록 함
+  const ids = selectedId ? [selectedId, ...order.filter((id) => id !== selectedId)] : order;
 
   return (
     <div className="scroll-thin h-full overflow-y-auto overscroll-contain">
@@ -25,7 +27,7 @@ export function ObjectsTab() {
             </p>
           ) : (
             <ul className="divide-y divide-line" data-testid="object-list">
-              {order.map((id) => (
+              {ids.map((id) => (
                 <ObjectRow key={id} id={id} selected={id === selectedId} />
               ))}
             </ul>

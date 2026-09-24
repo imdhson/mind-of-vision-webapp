@@ -216,13 +216,19 @@ async function main() {
     const autoLabel2 = await page.getByRole('button', { name: '기본 시점으로 복귀' }).textContent();
     check('기본 시점 복귀 시 자동 모드 재개', autoLabel2.includes('자동'), autoLabel2);
 
-    // 5) 객체 목록 탭
-    await page.getByRole('tab', { name: '객체 목록' }).click();
+    // 5) 설정 탭
+    await page.getByRole('tab', { name: '설정' }).click();
     await page.waitForTimeout(500);
     const listCount = await page.getByTestId('object-list').locator('li').count();
     check('객체 목록 표시', listCount >= 2, `${listCount}개`);
+    const lastId = await page.evaluate(() => window.__movDebug.objects.getState().order.at(-1));
+    await page.evaluate((id) => window.__movDebug.objects.getState().select(id), lastId);
+    await page.waitForTimeout(1200);
+    const firstAria = await page.getByTestId('object-list').locator('li').first().locator('button').first().getAttribute('aria-expanded');
+    check('선택 객체 최상단 고정', firstAria === 'true', firstAria);
+    await page.evaluate(() => window.__movDebug.objects.getState().select(null));
     const hasCameraSettings = await page.getByText('카메라 설정 · 보정').isVisible();
-    check('객체 목록 탭에 카메라 설정 존재', hasCameraSettings);
+    check('설정 탭에 카메라 설정 존재', hasCameraSettings);
     await page.screenshot({ path: join(OUT, '05-objects.png'), fullPage: true });
 
     // 6) 새로고침 후 영속 보정값 유지 + 개별 보정은 자동 연결되지 않음
@@ -289,7 +295,7 @@ async function main() {
     await m.getByRole('tab', { name: '3D 시각화' }).click();
     await m.waitForTimeout(1500);
     await m.screenshot({ path: join(OUT, '09-mobile-vision.png') });
-    await m.getByRole('tab', { name: '객체 목록' }).click();
+    await m.getByRole('tab', { name: '설정' }).click();
     await m.waitForTimeout(500);
     await m.screenshot({ path: join(OUT, '10-mobile-objects.png') });
     // 카메라 종료 → 추적 정리
