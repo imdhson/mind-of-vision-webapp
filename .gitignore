@@ -1,0 +1,17 @@
+node_modules/
+dist/
+dev-dist/
+coverage/
+*.log
+*.tsbuildinfo
+.vite/
+.DS_Store
+Thumbs.db
+.env
+.env.local
+*.local
+# 선택 모델(고정확도, 65MB)은 저장소에 포함하지 않음: npm run models:download -- --all
+public/models/coco-ssd-mobilenet-v2/
+# 배포용 ZIP / 테스트 산출물
+*.zip
+tests/e2e/output/

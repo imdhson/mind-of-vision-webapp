@@ -1,0 +1,128 @@
+@import 'tailwindcss';
+
+/*
+ * 디자인 토큰 — 블랙/화이트/그레이만 사용 (초록 계열 포인트 컬러 없음)
+ * 시스템 테마(prefers-color-scheme)에 따라 자동 전환됩니다.
+ */
+:root {
+  --bg: #f4f4f5;
+  --surface: #ffffff;
+  --surface-2: #ececee;
+  --fg: #0a0a0b;
+  --muted: #6b6b73;
+  --line: #d9d9de;
+  --accent: #0a0a0b;
+  --accent-fg: #ffffff;
+  --danger: #b42318;
+  --overlay: rgba(255, 255, 255, 0.82);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0a0a0b;
+    --surface: #141416;
+    --surface-2: #1d1d20;
+    --fg: #f4f4f5;
+    --muted: #93939b;
+    --line: #2a2a2e;
+    --accent: #f4f4f5;
+    --accent-fg: #0a0a0b;
+    --danger: #ff7b72;
+    --overlay: rgba(12, 12, 14, 0.8);
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-danger: var(--danger);
+  --color-overlay: var(--overlay);
+  --font-sans: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Noto Sans KR', sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+.mov-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-x {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.scroll-thin {
+  scrollbar-width: thin;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* 3D 객체 라벨 */
+.mov-label {
+  background: var(--overlay);
+  color: var(--fg);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background-color 0.2s;
+}
+.mov-label[data-selected='1'] {
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-weight: 600;
+}
