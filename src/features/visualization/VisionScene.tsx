@@ -8,6 +8,7 @@ import { useObjectStore } from '../../stores/objectStore';
 import { dampFactor } from '../../utils/math';
 import { AutoZoomController, homePose } from './AutoCameraController';
 import { ObjectMesh } from './ObjectRenderer';
+import { ObjectTrail } from './ObjectTrail';
 import { UserMarker } from './UserMarker';
 import type { ScenePalette } from './palette';
 import { getDebugBridge } from '../../services/debugBridge';
@@ -81,6 +82,10 @@ function Objects({ palette }: { palette: ScenePalette }) {
   const items = useObjectStore(useShallow((s) => s.order.map((id) => `${id}|${s.objects[id]?.classId ?? ''}`)));
   return (
     <>
+      {items.map((key) => {
+        const id = key.split('|')[0];
+        return <ObjectTrail key={`trail-${id}`} id={id} palette={palette} />;
+      })}
       {items.map((key) => {
         const [id, classId] = key.split('|');
         return <ObjectMesh key={id} id={id} classId={classId} palette={palette} />;

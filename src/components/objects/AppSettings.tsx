@@ -5,7 +5,10 @@ import { useCalibrationStore } from '../../stores/calibrationStore';
 import { useObjectStore } from '../../stores/objectStore';
 import { useUIStore } from '../../stores/uiStore';
 import { useInstallPrompt } from '../../hooks/useInstallPrompt';
-import { Button, Row, Section, cx } from '../common/ui';
+import { Button, NumberField, Row, Section, Switch, cx } from '../common/ui';
+
+const MIN_PROXIMITY_M = 0.3;
+const MAX_PROXIMITY_M = 10;
 
 /** AI 모델 · 앱 설치 · 데이터 관리 · 도움말 */
 export function AppSettings() {
@@ -14,12 +17,44 @@ export function AppSettings() {
   const stats = useObjectStore((s) => s.stats);
   const detectorStatus = useObjectStore((s) => s.detectorStatus);
   const detectorMessage = useObjectStore((s) => s.detectorMessage);
+  const proximityAlertEnabled = useUIStore((s) => s.proximityAlertEnabled);
+  const proximityAlertDistance = useUIStore((s) => s.proximityAlertDistance);
+  const setProximityAlertEnabled = useUIStore((s) => s.setProximityAlertEnabled);
+  const setProximityAlertDistance = useUIStore((s) => s.setProximityAlertDistance);
   const install = useInstallPrompt();
   const [help, setHelp] = useState(false);
   const [classes, setClasses] = useState(false);
 
   return (
     <>
+      <Section title="안전 알림">
+        <div className="space-y-2 p-3">
+          <Switch
+            id="proximity-alert"
+            checked={proximityAlertEnabled}
+            onChange={setProximityAlertEnabled}
+            label="근접 경고"
+          />
+          <p className="text-[11.5px] leading-relaxed text-muted">
+            추적 중인 객체가 설정한 거리보다 가까워지면 알림·소리·진동으로 알립니다(추정 거리 기준이며 오차가 있을 수
+            있습니다).
+          </p>
+          <NumberField
+            label="경고 거리"
+            unit="m"
+            min={MIN_PROXIMITY_M}
+            max={MAX_PROXIMITY_M}
+            step={0.1}
+            disabled={!proximityAlertEnabled}
+            value={proximityAlertDistance}
+            onChange={(v) => {
+              if (v == null || Number.isNaN(v)) return;
+              setProximityAlertDistance(Math.min(MAX_PROXIMITY_M, Math.max(MIN_PROXIMITY_M, v)));
+            }}
+          />
+        </div>
+      </Section>
+
       <Section title="AI 모델">
         <div className="space-y-1 p-3">
           {MODEL_REGISTRY.map((m) => (
@@ -109,6 +144,14 @@ function Help() {
       <p>
         <b>거리 추정의 한계</b> · 단일 카메라로는 절대 거리를 정확히 알 수 없습니다. 객체의 일반적인 크기, 카메라 화각,
         카메라 높이와 바닥 접지점을 조합한 추정값이며, 크기 편차가 큰 객체(강아지, 소파 등)는 오차가 큽니다.
+      </p>
+      <p>
+        <b>이동 궤적</b> · 3D 화면에서 움직이는 객체 아래에 최근 이동 경로가 옅은 선으로 표시됩니다. 정지한 물체에는
+        표시되지 않으며, 일정 시간이 지나거나 추적이 끝나면 사라집니다.
+      </p>
+      <p>
+        <b>근접 경고</b> · 앱 설정에서 켜면, 추적 중인 객체가 지정한 거리보다 가까워질 때 알림·소리·진동으로 안내합니다.
+        추정 거리를 기준으로 하므로 참고용으로만 사용하세요.
       </p>
       <p>
         <b>방향</b> · 사람·동물·탈것은 이동할 때 이동 방향을 바라보는 방향으로 추정합니다. 정지한 물체의 방향은 알 수 없어

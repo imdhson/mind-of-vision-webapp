@@ -4,6 +4,7 @@ import { useCameraStore } from '../../stores/cameraStore';
 import { useUIStore } from '../../stores/uiStore';
 import { getVisionPipeline } from '../../features/pipeline/VisionPipeline';
 import { getCameraManager } from '../../features/camera/CameraManager';
+import { startProximityMonitor } from '../../features/safety/proximityRuntime';
 import { initSettings } from '../../services/settings';
 import { registerServiceWorker } from '../../services/pwa';
 import { useWakeLock } from '../../hooks/useWakeLock';
@@ -26,6 +27,7 @@ export function AppRuntime({ children }: { children: ReactNode }) {
     booted = true;
     getDebugBridge();
     const pipeline = getVisionPipeline();
+    startProximityMonitor();
     void (async () => {
       await Promise.all([useCalibrationStore.getState().load(), initSettings()]);
       pipeline.start();

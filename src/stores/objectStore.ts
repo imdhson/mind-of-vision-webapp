@@ -1,7 +1,10 @@
 import { create } from 'zustand';
 import type { PipelineStats, TrackedObject } from '../types';
+import { TrailTracker, type TrailPoint } from '../features/visualization/TrailTracker';
 
 export type DetectorStatus = 'idle' | 'loading' | 'ready' | 'error';
+
+const trailTracker = new TrailTracker();
 
 interface ObjectState {
   /** 공통 객체 상태 — 카메라 화면·3D·목록이 모두 이 값을 사용 */
@@ -14,6 +17,8 @@ interface ObjectState {
   detectorStatus: DetectorStatus;
   detectorMessage: string | null;
   stats: PipelineStats;
+  /** 객체별 최근 이동 궤적 (시각화 좌표 X/Z, 바닥 평면). 2개 미만의 점은 포함하지 않음 */
+  trails: Record<string, TrailPoint[]>;
 
   setObjects(list: TrackedObject[]): void;
   clearObjects(): void;
@@ -35,6 +40,7 @@ export const useObjectStore = create<ObjectState>((set, get) => ({
   detectorStatus: 'idle',
   detectorMessage: null,
   stats: { backend: null, modelId: null, inferenceMs: 0, detectionFps: 0, lastFrameAt: 0 },
+  trails: {},
 
   setObjects(list) {
     const objects: Record<string, TrackedObject> = {};
@@ -48,16 +54,22 @@ export const useObjectStore = create<ObjectState>((set, get) => ({
       selectionEndedLabel = prev.objects[selectedId]?.label ?? '선택한 객체';
       selectedId = null;
     }
+    const active = list
+      .filter((o) => o.position && o.trackingState !== 'lost')
+      .map((o) => ({ id: o.id, x: o.position!.x, z: o.position!.z }));
+    const trails = trailTracker.update(active, performance.now());
     set({
       objects,
       order: sameOrder(order, prev.order) ? prev.order : order,
       selectedId,
       selectionEndedLabel,
+      trails,
     });
   },
 
   clearObjects() {
-    set({ objects: {}, order: [], selectedId: null });
+    trailTracker.reset();
+    set({ objects: {}, order: [], selectedId: null, trails: {} });
   },
 
   select(id) {

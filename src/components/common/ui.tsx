@@ -165,6 +165,43 @@ export function NumberField({
   );
 }
 
+/** 켜기/끄기 토글 스위치 */
+export function Switch({
+  checked,
+  onChange,
+  label,
+  id,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label?: ReactNode;
+  id?: string;
+}) {
+  return (
+    <label htmlFor={id} className="flex cursor-pointer items-center justify-between gap-3 py-1">
+      {label ? <span className="text-[13px] font-medium">{label}</span> : null}
+      <button
+        id={id}
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        onClick={() => onChange(!checked)}
+        className={cx(
+          'relative h-6 w-11 shrink-0 rounded-full border transition-colors',
+          checked ? 'border-accent bg-accent' : 'border-line bg-surface-2',
+        )}
+      >
+        <span
+          className={cx(
+            'absolute top-0.5 h-5 w-5 rounded-full shadow-sm transition-transform',
+            checked ? 'translate-x-5 bg-accent-fg' : 'translate-x-0.5 bg-surface',
+          )}
+        />
+      </button>
+    </label>
+  );
+}
+
 export function Row({ k, v, sub }: { k: ReactNode; v: ReactNode; sub?: ReactNode }) {
   return (
     <div className="flex items-baseline justify-between gap-3 py-1">
