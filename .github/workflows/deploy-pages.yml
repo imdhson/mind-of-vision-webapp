@@ -1,10 +1,10 @@
-# GitHub Pages 자동 배포: 기본 브랜치에 push 하면 빌드·테스트 후 HTTPS 로 배포합니다.
+# GitHub Pages 자동 배포: main 브랜치에 push(병합) 될 때만 빌드·테스트 후 HTTPS 로 배포합니다.
 # 최초 1회: 저장소 Settings → Pages → Build and deployment → Source 를 "GitHub Actions" 로 설정하세요.
 name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [claude/session-ev6hqc, claude/blissful-keller-34qg00, main]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
