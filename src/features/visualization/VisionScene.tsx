@@ -135,6 +135,7 @@ function CameraRig({
 }) {
   const controls = useRef<OrbitControlsImpl>(null);
   const camera = useThree((s) => s.camera);
+  const aspect = useThree((s) => s.size.width / Math.max(1, s.size.height));
   const zoom = useMemo(() => new AutoZoomController(), []);
   const returning = useRef(true);
   const tmpPos = useMemo(() => new Vector3(), []);
@@ -162,7 +163,7 @@ function CameraRig({
     }
     const r = zoom.update(pts, performance.now(), delta);
     if (!autoMode) return;
-    const pose = homePose(r);
+    const pose = homePose(r, aspect);
     tmpPos.set(pose.position.x, pose.position.y, pose.position.z);
     tmpTarget.set(pose.target.x, pose.target.y, pose.target.z);
     // 복귀 중에는 비교적 빠르게(0.45s), 이후에는 반경 변화만 따라감(반경 자체가 매우 느리게 변함)

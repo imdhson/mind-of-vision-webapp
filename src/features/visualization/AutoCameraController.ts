@@ -138,10 +138,14 @@ export class AutoZoomController {
   }
 }
 
-/** 반경 r 에 대한 기본(홈) 카메라 자세: 사용자 뒤쪽 위에서 전방을 내려다봄 */
-export function homePose(r: number) {
+/**
+ * 반경 r 에 대한 기본(홈) 카메라 자세: 사용자 뒤쪽 위에서 전방을 내려다봄
+ * @param aspect 화면 가로/세로 비. 세로 화면(좁은 수평 시야)에서는 더 멀리서 봐서 좌우 객체도 보이게 함
+ */
+export function homePose(r: number, aspect = 1.6) {
   const elevation = (52 * Math.PI) / 180;
-  const dist = r * 1.2;
+  const aspectFactor = aspect < 1.2 ? clamp(1.2 / Math.max(aspect, 0.3), 1, 2.4) : 1;
+  const dist = r * 1.2 * aspectFactor;
   const target = { x: 0, y: 0, z: -r * 0.38 };
   return {
     target,

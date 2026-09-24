@@ -62,4 +62,10 @@ describe('AutoZoomController', () => {
     expect(p.target.z).toBeLessThan(0);
     expect(p.position.z).toBeGreaterThan(p.target.z);
   });
+
+  it('pulls back further on portrait screens', () => {
+    const land = homePose(6, 1.6);
+    const port = homePose(6, 0.46);
+    expect(port.position.y).toBeGreaterThan(land.position.y * 1.5);
+  });
 });
