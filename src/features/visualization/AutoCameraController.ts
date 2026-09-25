@@ -3,10 +3,12 @@ import { clamp, dampFactor, quantile } from '../../utils/math';
 /**
  * 기본 시점 자동 확대·축소 제어기 (렌더링과 독립된 순수 로직 — 단위 테스트 대상)
  *
- * 목표: 가까운 객체와 먼 객체를 모두 볼 수 있는 시야 반경(r)을 유지하되, 매우 느리고 안정적으로 변화.
+ * 목표: 가까운(안전상 중요한) 객체 위주로 잘 보이는 시야 반경(r)을 유지하되, 매우 느리고 안정적으로 변화.
+ *   먼 객체 하나 때문에 전체 시야가 과도하게 축소되어 정작 가까운 객체가 안 보이는 일이 없도록,
+ *   시야 반경에는 상한(maxRadius)을 두고 먼 객체의 영향은 완만한 분위수로 제한한다.
  *
  * 안정화 기법
- *  - 분위수(90%) 사용: 멀리 튀는 단일 추정값에 과민 반응하지 않음
+ *  - 분위수(75%) 사용: 소수의 먼 객체(이상치)에 과민 반응하지 않음
  *  - 히스테리시스: 목표 대비 변화율이 임계값(기본 20%) 미만이면 무시
  *  - 지속 시간 조건(디바운스): 변화가 일정 시간 계속되어야 목표 변경
  *    (확대보다 축소를 더 오래 기다림 → 객체가 잠깐 사라져도 급격히 축소되지 않음)
@@ -37,7 +39,7 @@ export interface AutoZoomConfig {
 
 export const DEFAULT_AUTO_ZOOM: AutoZoomConfig = {
   minRadius: 3.5,
-  maxRadius: 32,
+  maxRadius: 16,
   defaultRadius: 6,
   margin: 1.25,
   padding: 1.2,
@@ -80,7 +82,7 @@ export class AutoZoomController {
   desiredRadius(points: PlanarPoint[]): number | null {
     if (points.length === 0) return null;
     const dists = points.map((p) => Math.hypot(p.x, p.z));
-    const extent = points.length >= 3 ? quantile(dists, 0.9) : Math.max(...dists);
+    const extent = points.length >= 3 ? quantile(dists, 0.75) : Math.max(...dists);
     const c = this.config;
     return clamp(extent * c.margin + c.padding, c.minRadius, c.maxRadius);
   }
