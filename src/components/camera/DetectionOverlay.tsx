@@ -6,12 +6,14 @@ import { fitRect, pointInBox, boxArea } from '../../utils/geometry';
 import { dampFactor } from '../../utils/math';
 import { fmtDistance } from '../../utils/format';
 import type { NormalizedBox } from '../../types';
+import type { LaneScene } from '../../features/lanes/laneGeometry';
 
 /**
  * 인식 결과 오버레이 (Canvas 2D, requestAnimationFrame)
  * - 추론 주기(약 10Hz)와 무관하게 60fps 로 상자를 보간해 흔들림을 줄입니다.
  * - 정규화 좌표 + object-fit 사각형 변환으로 해상도/화면 크기 변화에도 정확히 정렬됩니다.
  * - 터치/클릭으로 객체를 선택합니다(모바일용 여유 판정 영역 포함).
+ * - 인식된 차선(도로 경계)을 상자 아래에 선과 옅은 주행 영역으로 그립니다.
  */
 export function DetectionOverlay() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -20,6 +22,7 @@ export function DetectionOverlay() {
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext('2d')!;
     const shown = new Map<string, NormalizedBox>();
+    const shownLanes: Record<'left' | 'right', LaneSegment | null> = { left: null, right: null };
     let raf = 0;
     let last = performance.now();
     const fontFamily = getComputedStyle(document.body).fontFamily;
@@ -42,11 +45,13 @@ export function DetectionOverlay() {
       const active = useCameraStore.getState().active;
       if (!active) {
         shown.clear();
+        shownLanes.left = shownLanes.right = null;
         return;
       }
-      const { objects, selectedId } = useObjectStore.getState();
+      const { objects, selectedId, lanes } = useObjectStore.getState();
       const rect = fitRect(w, h, active.videoWidth, active.videoHeight, useUIStore.getState().fitMode);
       const k = dampFactor(dt, 0.07);
+      drawLanes(ctx, lanes, shownLanes, rect, k);
       for (const id of shown.keys()) if (!objects[id]) shown.delete(id);
 
       const entries = Object.values(objects).sort((a, b) => (a.id === selectedId ? 1 : b.id === selectedId ? -1 : 0));
@@ -156,6 +161,84 @@ export function DetectionOverlay() {
       data-testid="detection-overlay"
     />
   );
+}
+
+const LANE_COLOR = '#4da3ff';
+
+interface LaneSegment {
+  bx: number;
+  by: number;
+  tx: number;
+  ty: number;
+  confidence: number;
+}
+
+/**
+ * 차선: 좌/우 경계선(어두운 외곽선 + 파란 선) + 두 선 사이 주행 영역을 옅게 채움.
+ * 흰색 노면 표시 위에서도 구분되도록 차선만 파란색을 사용합니다.
+ */
+function drawLanes(
+  ctx: CanvasRenderingContext2D,
+  lanes: LaneScene,
+  shown: Record<'left' | 'right', LaneSegment | null>,
+  rect: { x: number; y: number; width: number; height: number },
+  k: number,
+) {
+  for (const side of ['left', 'right'] as const) {
+    const t = lanes[side];
+    if (!t) {
+      shown[side] = null;
+      continue;
+    }
+    const target = { bx: t.bottom.x, by: t.bottom.y, tx: t.top.x, ty: t.top.y, confidence: t.confidence };
+    const p = shown[side];
+    shown[side] = p
+      ? {
+          bx: p.bx + (target.bx - p.bx) * k,
+          by: p.by + (target.by - p.by) * k,
+          tx: p.tx + (target.tx - p.tx) * k,
+          ty: p.ty + (target.ty - p.ty) * k,
+          confidence: target.confidence,
+        }
+      : target;
+  }
+  const px = (x: number) => rect.x + x * rect.width;
+  const py = (y: number) => rect.y + y * rect.height;
+  const { left, right } = shown;
+  if (!left && !right) return;
+  ctx.save();
+  // 영상 영역 밖(레터박스)으로 선이 나가지 않도록 자름
+  ctx.beginPath();
+  ctx.rect(rect.x, rect.y, rect.width, rect.height);
+  ctx.clip();
+  if (left && right) {
+    const grad = ctx.createLinearGradient(0, py(Math.min(left.ty, right.ty)), 0, py(1));
+    grad.addColorStop(0, 'rgba(77,163,255,0)');
+    grad.addColorStop(1, 'rgba(77,163,255,0.28)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(px(left.bx), py(left.by));
+    ctx.lineTo(px(left.tx), py(left.ty));
+    ctx.lineTo(px(right.tx), py(right.ty));
+    ctx.lineTo(px(right.bx), py(right.by));
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.lineCap = 'round';
+  for (const l of [left, right]) {
+    if (!l) continue;
+    ctx.globalAlpha = 0.55 + 0.45 * Math.min(1, l.confidence * 1.5);
+    ctx.beginPath();
+    ctx.moveTo(px(l.bx), py(l.by));
+    ctx.lineTo(px(l.tx), py(l.ty));
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+    ctx.stroke();
+    ctx.lineWidth = 4.5;
+    ctx.strokeStyle = LANE_COLOR;
+    ctx.stroke();
+  }
+  ctx.restore();
 }
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {

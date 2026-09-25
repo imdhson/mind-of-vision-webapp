@@ -21,6 +21,8 @@ export function AppSettings() {
   const proximityAlertDistance = useUIStore((s) => s.proximityAlertDistance);
   const setProximityAlertEnabled = useUIStore((s) => s.setProximityAlertEnabled);
   const setProximityAlertDistance = useUIStore((s) => s.setProximityAlertDistance);
+  const laneDetectionEnabled = useUIStore((s) => s.laneDetectionEnabled);
+  const setLaneDetectionEnabled = useUIStore((s) => s.setLaneDetectionEnabled);
   const install = useInstallPrompt();
   const [help, setHelp] = useState(false);
   const [classes, setClasses] = useState(false);
@@ -52,6 +54,21 @@ export function AppSettings() {
               setProximityAlertDistance(Math.min(MAX_PROXIMITY_M, Math.max(MIN_PROXIMITY_M, v)));
             }}
           />
+        </div>
+      </Section>
+
+      <Section title="도로 인식">
+        <div className="space-y-2 p-3">
+          <Switch
+            id="lane-detection"
+            checked={laneDetectionEnabled}
+            onChange={setLaneDetectionEnabled}
+            label="차선(도로 경계) 인식"
+          />
+          <p className="text-[11.5px] leading-relaxed text-muted">
+            카메라 화면 아래쪽에서 차선·도로 가장자리처럼 앞쪽으로 뻗은 경계선을 찾아 카메라 화면과 3D 바닥에 그립니다.
+            실내나 경계가 많은 장면에서는 다른 직선을 차선으로 잘못 표시할 수 있습니다.
+          </p>
         </div>
       </Section>
 
@@ -173,6 +190,10 @@ function Help() {
       <p>
         <b>이동 궤적</b> · 3D 화면에서 움직이는 객체 아래에 최근 이동 경로가 옅은 선으로 표시됩니다. 정지한 물체에는
         표시되지 않으며, 일정 시간이 지나거나 추적이 끝나면 사라집니다.
+      </p>
+      <p>
+        <b>차선 인식</b> · 카메라 화면 위쪽 버튼 또는 앱 설정에서 켜고 끌 수 있습니다. 좌/우 도로 경계를 흰 선으로, 그
+        사이 주행 영역을 옅게 표시하며, 3D 화면에서는 카메라 높이·기울기로 바닥에 투영해 보여줍니다.
       </p>
       <p>
         <b>근접 경고</b> · 앱 설정에서 켜면, 추적 중인 객체가 지정한 거리보다 가까워질 때 알림·소리·진동으로 안내합니다.

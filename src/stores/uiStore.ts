@@ -19,12 +19,15 @@ interface UIState {
   proximityAlertEnabled: boolean;
   /** 이 거리(m) 미만으로 가까워지면 경고 */
   proximityAlertDistance: number;
+  /** 차선(도로 경계) 인식 사용 여부 */
+  laneDetectionEnabled: boolean;
   setTab(tab: TabId): void;
   setFitMode(mode: FitMode): void;
   setModelId(id: string): void;
   setPreferredDeviceId(id: string | null): void;
   setProximityAlertEnabled(v: boolean): void;
   setProximityAlertDistance(v: number): void;
+  setLaneDetectionEnabled(v: boolean): void;
   toast(message: string, kind?: Toast['kind']): void;
   dismissToast(id: number): void;
 }
@@ -39,12 +42,14 @@ export const useUIStore = create<UIState>((set) => ({
   toasts: [],
   proximityAlertEnabled: false,
   proximityAlertDistance: 1.5,
+  laneDetectionEnabled: true,
   setTab: (tab) => set({ tab }),
   setFitMode: (fitMode) => set({ fitMode }),
   setModelId: (modelId) => set({ modelId }),
   setPreferredDeviceId: (preferredDeviceId) => set({ preferredDeviceId }),
   setProximityAlertEnabled: (proximityAlertEnabled) => set({ proximityAlertEnabled }),
   setProximityAlertDistance: (proximityAlertDistance) => set({ proximityAlertDistance }),
+  setLaneDetectionEnabled: (laneDetectionEnabled) => set({ laneDetectionEnabled }),
   toast(message, kind = 'info') {
     const id = ++toastSeq;
     set((s) => ({ toasts: [...s.toasts.slice(-2), { id, message, kind }] }));

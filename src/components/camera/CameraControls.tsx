@@ -4,16 +4,18 @@ import { deviceDisplayName, LENS_LABEL_KO } from '../../features/camera/CameraDe
 import { startDeviceTilt } from '../../services/deviceTilt';
 import { useCameraStore } from '../../stores/cameraStore';
 import { useUIStore } from '../../stores/uiStore';
-import { IconCheck, IconFit, IconFlip, IconLens, IconPower } from '../common/Icons';
+import { IconCheck, IconFit, IconFlip, IconLens, IconPower, IconRoad } from '../common/Icons';
 import { OverlayButton, cx } from '../common/ui';
 
-/** 카메라 화면 상단의 실시간 조작 버튼 (시작/종료 · 전면/후면 전환 · 렌즈 선택 · 화면 맞춤) */
+/** 카메라 화면 상단의 실시간 조작 버튼 (시작/종료 · 차선 인식 · 전면/후면 전환 · 렌즈 선택 · 화면 맞춤) */
 export function CameraControls() {
   const status = useCameraStore((s) => s.status);
   const devices = useCameraStore((s) => s.devices);
   const active = useCameraStore((s) => s.active);
   const fitMode = useUIStore((s) => s.fitMode);
   const setFitMode = useUIStore((s) => s.setFitMode);
+  const laneDetection = useUIStore((s) => s.laneDetectionEnabled);
+  const setLaneDetection = useUIStore((s) => s.setLaneDetectionEnabled);
   const [lensOpen, setLensOpen] = useState(false);
   const running = status === 'running' || status === 'switching';
   const busy = status === 'switching' || status === 'requesting';
@@ -35,6 +37,15 @@ export function CameraControls() {
           }}
         >
           <IconPower />
+        </OverlayButton>
+        <OverlayButton
+          aria-label={laneDetection ? '차선 인식 끄기' : '차선 인식 켜기'}
+          aria-pressed={laneDetection}
+          title={laneDetection ? '차선 인식 끄기' : '차선 인식 켜기'}
+          active={laneDetection}
+          onClick={() => setLaneDetection(!laneDetection)}
+        >
+          <IconRoad />
         </OverlayButton>
       </div>
       <div className="pointer-events-auto relative flex gap-1.5">
