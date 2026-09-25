@@ -1,6 +1,16 @@
 @import 'tailwindcss';
 
 /*
+ * Tailwind v4의 rounded-full 유틸리티는 border-radius: calc(infinity * 1px)로 컴파일되어
+ * 매우 큰 값(2147483647px)이 되는데, 일부 모바일 브라우저(Samsung Internet 등)에서는
+ * 이 값 때문에 둥근 버튼/토글의 렌더링 크기가 실제 레이아웃보다 훨씬 크게 그려지는
+ * 버그가 있습니다. 항상 동일하게 완전히 둥근 모양을 만드는 안전한 값으로 고정합니다.
+ */
+.rounded-full {
+  border-radius: 9999px;
+}
+
+/*
  * 디자인 토큰 — 블랙/화이트/그레이만 사용 (초록 계열 포인트 컬러 없음)
  * 시스템 테마(prefers-color-scheme)에 따라 자동 전환됩니다.
  */
