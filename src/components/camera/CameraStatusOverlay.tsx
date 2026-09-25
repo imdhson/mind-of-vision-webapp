@@ -23,7 +23,7 @@ export function CameraStatusOverlay() {
     if (detectorStatus === 'loading' || detectorStatus === 'error') {
       return (
         <div className="pointer-events-none absolute inset-x-0 bottom-3 z-10 flex justify-center">
-          <span className="rounded-full bg-overlay px-3 py-1.5 text-[12px] text-fg backdrop-blur-md">
+          <span className="rounded-full bg-overlay px-3.5 py-1.5 text-[12px] font-medium text-fg shadow-sm backdrop-blur-md">
             {detectorStatus === 'loading' ? (detectorMessage ?? 'AI 모델 준비 중…') : detectorMessage}
           </span>
         </div>
@@ -32,7 +32,9 @@ export function CameraStatusOverlay() {
     if (status === 'switching') {
       return (
         <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center">
-          <span className="rounded-full bg-overlay px-3 py-1.5 text-[12px] backdrop-blur-md">카메라 전환 중…</span>
+          <span className="rounded-full bg-overlay px-3.5 py-1.5 text-[12px] font-medium shadow-sm backdrop-blur-md">
+            카메라 전환 중…
+          </span>
         </div>
       );
     }
@@ -54,7 +56,7 @@ export function CameraStatusOverlay() {
             <button
               type="button"
               onClick={start}
-              className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-5 text-[14px] font-semibold text-black active:opacity-80"
+              className="inline-flex h-12 items-center gap-2 rounded-full bg-accent px-6 text-[14px] font-bold text-accent-fg shadow-lg active:opacity-85"
             >
               <IconCamera size={18} />
               {error ? '다시 시도' : '카메라 시작'}
@@ -66,7 +68,7 @@ export function CameraStatusOverlay() {
                   <button
                     key={d.deviceId || i}
                     type="button"
-                    className="block w-full truncate rounded-lg border border-white/25 px-3 py-2 text-[12px] text-white/90"
+                    className="block w-full truncate rounded-2xl bg-white/10 px-3 py-2 text-[12px] text-white/90"
                     onClick={() => {
                       void startDeviceTilt();
                       void getCameraManager().switchTo(d.deviceId);

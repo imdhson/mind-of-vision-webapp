@@ -35,7 +35,7 @@ export function InstanceLinker({ object }: { object: TrackedObject }) {
   if (boundId) {
     const inst = instances[boundId];
     return (
-      <div className="flex items-center justify-between gap-2 rounded-lg border border-line px-3 py-2">
+      <div className="flex items-center justify-between gap-2 rounded-2xl bg-surface-2 px-3.5 py-2.5">
         <div className="min-w-0 text-[12px]">
           <span className="text-muted">연결됨 </span>
           <span className="font-medium">{inst?.name ?? boundId}</span>
@@ -50,11 +50,11 @@ export function InstanceLinker({ object }: { object: TrackedObject }) {
     return <p className="text-[11px] text-muted">저장하면 이 물체 전용 보정값이 새로 만들어집니다.</p>;
   }
   return (
-    <div className="rounded-lg border border-line p-2">
+    <div className="rounded-2xl bg-surface-2 p-3">
       <div className="mb-1.5 text-[12px] font-medium">저장된 개별 보정 연결</div>
       <div className="flex gap-2">
         <select
-          className="h-9 min-w-0 flex-1 rounded-lg border border-line bg-surface px-2 text-[13px]"
+          className="h-9 min-w-0 flex-1 rounded-xl bg-surface px-2 text-[13px]"
           value={pick}
           onChange={(e) => setPick(e.target.value)}
           aria-label="연결할 개별 보정 선택"

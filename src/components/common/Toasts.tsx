@@ -14,8 +14,8 @@ export function Toasts() {
           onClick={() => dismiss(t.id)}
           role={t.kind === 'error' ? 'alert' : 'status'}
           className={cx(
-            'pointer-events-auto max-w-sm rounded-lg px-3 py-2 text-[12.5px] font-medium shadow-sm backdrop-blur-md',
-            t.kind === 'error' ? 'bg-overlay text-danger' : 'bg-accent text-accent-fg',
+            'pointer-events-auto max-w-sm rounded-full px-4 py-2.5 text-[12.5px] font-semibold shadow-lg backdrop-blur-md',
+            t.kind === 'error' ? 'bg-danger text-white' : 'bg-accent text-accent-fg',
           )}
         >
           {t.message}

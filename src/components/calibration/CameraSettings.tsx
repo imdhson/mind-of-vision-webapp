@@ -114,10 +114,10 @@ export function CameraSettings() {
               }}
             />
           </div>
-          <label className="flex items-center justify-between gap-3 rounded-lg bg-surface-2 px-3 py-2">
-            <span className="text-[12.5px]">
+          <label className="flex items-center justify-between gap-3 rounded-2xl bg-surface-2 px-3.5 py-3">
+            <span className="text-[12.5px] font-medium">
               기기 기울기 센서 사용
-              <span className="block text-[10.5px] text-muted">
+              <span className="block text-[10.5px] font-normal text-muted">
                 {sensorPitch != null
                   ? `현재 측정 기울기 ${fmtDeg(sensorPitch)} (아래+)`
                   : '센서 값 없음 · 기본 기울기 사용'}
@@ -125,7 +125,7 @@ export function CameraSettings() {
             </span>
             <input
               type="checkbox"
-              className="size-5 accent-current"
+              className="size-5 accent-accent"
               checked={form.useDeviceTilt}
               onChange={(e) => setForm({ ...form, useDeviceTilt: e.target.checked })}
             />

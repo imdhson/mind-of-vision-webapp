@@ -80,8 +80,8 @@ export function AppSettings() {
               type="button"
               onClick={() => setModelId(m.id)}
               className={cx(
-                'flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left',
-                modelId === m.id ? 'border-fg' : 'border-line',
+                'flex w-full items-center justify-between rounded-2xl px-3.5 py-2.5 text-left',
+                modelId === m.id ? 'bg-accent-soft' : 'bg-surface-2',
               )}
             >
               <span>
@@ -90,7 +90,7 @@ export function AppSettings() {
                   {m.description} · 약 {m.approxSizeMB}MB
                 </span>
               </span>
-              {modelId === m.id ? <span className="text-[11px] font-semibold">사용 중</span> : null}
+              {modelId === m.id ? <span className="text-[11px] font-semibold text-accent">사용 중</span> : null}
             </button>
           ))}
           <div className="pt-1">
@@ -171,7 +171,7 @@ export function AppSettings() {
 
 function Help() {
   return (
-    <div className="space-y-2 rounded-lg bg-surface-2 p-3 text-[12px] leading-relaxed">
+    <div className="space-y-2 rounded-2xl bg-surface-2 p-3.5 text-[12px] leading-relaxed">
       <p>
         <b>객체 선택</b> · 카메라 화면의 상자나 3D 화면의 도형을 누르면 선택됩니다. 선택은 세 탭에서 공유됩니다.
       </p>

@@ -107,7 +107,7 @@ function LensMenu({ onClose }: { onClose: () => void }) {
     <div
       ref={ref}
       role="menu"
-      className="absolute right-0 top-12 w-72 max-w-[calc(100vw-16px)] rounded-xl bg-overlay p-1.5 text-fg shadow-lg backdrop-blur-xl"
+      className="absolute right-0 top-[52px] w-72 max-w-[calc(100vw-16px)] rounded-[24px] bg-overlay p-2 text-fg shadow-lg backdrop-blur-xl"
     >
       {devices.length === 0 ? (
         <p className="px-2 py-2 text-[12px] text-muted">카메라를 시작하면 사용 가능한 장치가 표시됩니다.</p>
@@ -122,8 +122,8 @@ function LensMenu({ onClose }: { onClose: () => void }) {
               aria-checked={current}
               type="button"
               className={cx(
-                'flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left active:bg-surface-2',
-                current && 'font-semibold',
+                'flex w-full items-center gap-2 rounded-2xl px-3 py-2.5 text-left active:bg-surface-2',
+                current && 'bg-accent-soft font-semibold text-accent',
               )}
               onClick={() => {
                 onClose();
@@ -155,13 +155,13 @@ function ZoomControl() {
   const [value, setValue] = useState(active.currentZoom ?? zoom.min);
   return (
     <div className="mt-1 border-t border-line px-2 pt-2">
-      <div className="flex items-center justify-between text-[12px]">
+      <div className="flex items-center justify-between text-[12px] font-medium">
         <span>줌</span>
         <span className="tabular text-muted">{value.toFixed(1)}×</span>
       </div>
       <input
         type="range"
-        className="w-full accent-current"
+        className="w-full accent-accent"
         min={zoom.min}
         max={zoom.max}
         step={zoom.step || 0.1}

@@ -1,4 +1,4 @@
-/** 3D 장면 색상 (블랙/화이트/그레이, 시스템 테마별) */
+/** 3D 장면 색상 (그레이 톤 + 선택 시 One UI 포인트 블루, 시스템 테마별) */
 export interface ScenePalette {
   background: string;
   object: string;
@@ -19,10 +19,10 @@ export interface ScenePalette {
 }
 
 export const DARK_PALETTE: ScenePalette = {
-  background: '#0a0a0b',
+  background: '#000000',
   object: '#a9a9b0',
-  selected: '#ffffff',
-  selectedEmissive: '#3a3a3a',
+  selected: '#4c8dff',
+  selectedEmissive: '#1c3d75',
   ring: '#8a8a92',
   gridCell: '#18181b',
   gridSection: '#222226',
@@ -37,10 +37,10 @@ export const DARK_PALETTE: ScenePalette = {
 };
 
 export const LIGHT_PALETTE: ScenePalette = {
-  background: '#f4f4f5',
+  background: '#f2f3f5',
   object: '#55555c',
-  selected: '#0a0a0b',
-  selectedEmissive: '#000000',
+  selected: '#1567ea',
+  selectedEmissive: '#0d3b8f',
   ring: '#6b6b73',
   gridCell: '#e7e7ea',
   gridSection: '#dcdce0',

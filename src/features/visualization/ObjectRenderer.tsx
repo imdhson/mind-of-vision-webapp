@@ -253,7 +253,7 @@ export const ObjectMesh = memo(function ObjectMesh({
         <Html center zIndexRange={[20, 0]} style={{ pointerEvents: 'none' }}>
           <div
             ref={labelEl}
-            className="mov-label whitespace-nowrap rounded-md px-1.5 py-0.5 text-[10.5px] font-medium tabular"
+            className="mov-label whitespace-nowrap rounded-full px-2 py-0.5 text-[10.5px] font-medium tabular"
           />
         </Html>
       </group>
