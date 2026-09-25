@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { PipelineStats, TrackedObject } from '../types';
 import { TrailTracker, type TrailPoint } from '../features/visualization/TrailTracker';
+import { EMPTY_LANES, type LaneScene } from '../features/lanes/laneGeometry';
 
 export type DetectorStatus = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -19,9 +20,12 @@ interface ObjectState {
   stats: PipelineStats;
   /** 객체별 최근 이동 궤적 (시각화 좌표 X/Z, 바닥 평면). 2개 미만의 점은 포함하지 않음 */
   trails: Record<string, TrailPoint[]>;
+  /** 인식된 차선(도로 경계). 카메라 화면 오버레이와 3D 바닥에 함께 표시 */
+  lanes: LaneScene;
 
   setObjects(list: TrackedObject[]): void;
   clearObjects(): void;
+  setLanes(lanes: LaneScene): void;
   select(id: string | null): void;
   dismissSelectionEnded(): void;
   setDetector(status: DetectorStatus, message?: string | null): void;
@@ -41,6 +45,7 @@ export const useObjectStore = create<ObjectState>((set, get) => ({
   detectorMessage: null,
   stats: { backend: null, modelId: null, inferenceMs: 0, detectionFps: 0, lastFrameAt: 0 },
   trails: {},
+  lanes: EMPTY_LANES,
 
   setObjects(list) {
     const objects: Record<string, TrackedObject> = {};
@@ -67,7 +72,13 @@ export const useObjectStore = create<ObjectState>((set, get) => ({
 
   clearObjects() {
     trailTracker.reset();
-    set({ objects: {}, order: [], selectedId: null, trails: {} });
+    set({ objects: {}, order: [], selectedId: null, trails: {}, lanes: EMPTY_LANES });
+  },
+
+  setLanes(lanes) {
+    // 둘 다 없으면 항상 EMPTY_LANES 로 통일: 없음 → 없음은 구독자에게 변경 알림을 보내지 않음
+    const next = lanes.left || lanes.right ? lanes : EMPTY_LANES;
+    if (next !== get().lanes) set({ lanes: next });
   },
 
   select(id) {

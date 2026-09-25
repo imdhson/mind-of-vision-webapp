@@ -9,6 +9,7 @@ import { dampFactor } from '../../utils/math';
 import { AutoZoomController, homePose } from './AutoCameraController';
 import { ObjectMesh } from './ObjectRenderer';
 import { ObjectTrail } from './ObjectTrail';
+import { LaneLines } from './LaneLines';
 import { UserMarker } from './UserMarker';
 import type { ScenePalette } from './palette';
 import { getDebugBridge } from '../../services/debugBridge';
@@ -69,6 +70,7 @@ export function VisionScene({ active, palette, hfovRad, autoMode, onUserInteract
         raycast={() => null}
       />
       <DistanceRings color={palette.distanceRing} />
+      <LaneLines palette={palette} />
       <UserMarker palette={palette} hfovRad={hfovRad} />
       <Objects palette={palette} />
       <CameraRig autoMode={autoMode} onUserInteract={onUserInteract} resetToken={resetToken} />

@@ -2,6 +2,7 @@ import type { AppearanceSignature, CameraProfile, TrackSnapshot, TrackedObject }
 import { useCameraStore } from '../../stores/cameraStore';
 import { useCalibrationStore } from '../../stores/calibrationStore';
 import { useObjectStore } from '../../stores/objectStore';
+import { useUIStore } from '../../stores/uiStore';
 import { getCameraManager } from '../camera/CameraManager';
 import { computeIntrinsics, createDefaultProfile, profileKey, zoomFactorOf } from '../camera/CameraCalibration';
 import { CocoSsdDetector, type DetectorFactory, type ObjectDetector } from '../detection/ObjectDetector';
@@ -13,11 +14,15 @@ import { resolveCalibration } from '../calibration/CalibrationManager';
 import { computeAppearance } from '../../utils/appearance';
 import { DEG } from '../../utils/math';
 import { buildTrackedObject, computeGeometry, type BuildContext } from './objectBuilder';
+import { detectLanes, roiTopFor } from '../lanes/LaneDetector';
+import { LaneTracker, type LaneLine } from '../lanes/LaneTracker';
+import { EMPTY_LANES, laneToGround, type DetectedLane } from '../lanes/laneGeometry';
 
 /**
  * 실시간 처리 파이프라인
  *
  *  카메라 프레임 → AI 인식 → 추적 → 거리/좌표/방향 → 보정 적용 → 공통 객체 상태(objectStore)
+ *               ↘ 차선(도로 경계) 인식 → 시간 안정화 → 바닥 투영 → objectStore.lanes
  *
  * - 추론 루프는 렌더링과 분리된 비동기 루프이며, 이전 추론이 끝나기 전에는 새 추론을 시작하지 않습니다.
  * - 카메라 전환(generation 변경) 후 도착한 이전 스트림의 결과는 폐기합니다.
@@ -29,6 +34,8 @@ import { buildTrackedObject, computeGeometry, type BuildContext } from './object
  */
 const MIN_INTERVAL_MS = 70; // 최대 약 14회/초
 const APPEARANCE_WIDTH = 160;
+/** 차선 인식용 축소 프레임 너비(px). 가는 차선도 남도록 외형 특징용보다 크게 */
+const LANE_WIDTH = 256;
 /** 이 횟수만큼 연속으로 추론이 실패하면 모델을 다시 불러옵니다. */
 export const MAX_CONSECUTIVE_ERRORS = 3;
 /** 성공 없이 연속으로 시도할 수 있는 복구 횟수 */
@@ -51,6 +58,8 @@ export class VisionPipelineImpl {
   private lastObservedAt = 0;
   private fpsSamples: number[] = [];
   private appearanceCanvas: HTMLCanvasElement | null = null;
+  private laneCanvas: HTMLCanvasElement | null = null;
+  private laneTracker = new LaneTracker();
   private unsubscribers: (() => void)[] = [];
   private consecutiveErrors = 0;
   private recoveryAttempts = 0;
@@ -108,7 +117,9 @@ export class VisionPipelineImpl {
     this.tracker.reset();
     this.orientation.reset();
     this.lastTracks = [];
+    this.laneTracker.reset();
     useObjectStore.getState().setObjects([]);
+    useObjectStore.getState().setLanes(EMPTY_LANES);
     useCalibrationStore.getState().pruneTracks(new Set());
   }
 
@@ -135,6 +146,12 @@ export class VisionPipelineImpl {
           this.publish(false);
         }
       }),
+      useUIStore.subscribe((s, prev) => {
+        if (s.laneDetectionEnabled !== prev.laneDetectionEnabled && !s.laneDetectionEnabled) {
+          this.laneTracker.reset();
+          useObjectStore.getState().setLanes(EMPTY_LANES);
+        }
+      }),
     );
   }
 
@@ -154,6 +171,11 @@ export class VisionPipelineImpl {
         // 인식 대상이 없을 때도 유예 기간 처리를 위해 추적 상태 갱신
         if (this.lastTracks.length && performance.now() - this.lastObservedAt > 250)
           this.step([], [], performance.now());
+        // 영상이 없으면 마지막 차선을 남겨두지 않음
+        if (useObjectStore.getState().lanes !== EMPTY_LANES) {
+          this.laneTracker.reset();
+          useObjectStore.getState().setLanes(EMPTY_LANES);
+        }
         await sleep(document.visibilityState === 'visible' ? 120 : 500);
         continue;
       }
@@ -178,6 +200,7 @@ export class VisionPipelineImpl {
               )
             : detections.map(() => null);
           this.step(detections, appearances, timestamp);
+          if (useUIStore.getState().laneDetectionEnabled) this.detectLanes(video, timestamp);
           this.lastObservedAt = timestamp;
           this.recordStats(inferenceMs, timestamp);
         }
@@ -254,6 +277,38 @@ export class VisionPipelineImpl {
     } catch {
       return null;
     }
+  }
+
+  /** 차선(도로 경계) 인식. 캔버스를 쓸 수 없는 환경에서는 건너뜁니다. */
+  private detectLanes(video: HTMLVideoElement, timestamp: number) {
+    let frame: ImageData;
+    try {
+      if (!this.laneCanvas) this.laneCanvas = document.createElement('canvas');
+      const c = this.laneCanvas;
+      const w = LANE_WIDTH;
+      const h = Math.max(1, Math.round((video.videoHeight / video.videoWidth) * w));
+      if (c.width !== w || c.height !== h) {
+        c.width = w;
+        c.height = h;
+      }
+      const g = c.getContext('2d', { willReadFrequently: true });
+      if (!g) return;
+      g.drawImage(video, 0, 0, w, h);
+      frame = g.getImageData(0, 0, w, h);
+    } catch {
+      return;
+    }
+    const ctx = this.buildContext();
+    const roiTop = roiTopFor(ctx?.pitch ?? null, ctx ? ctx.intrinsics.fy / ctx.intrinsics.height : null);
+    const state = this.laneTracker.update(detectLanes(frame.data, frame.width, frame.height, roiTop), timestamp);
+    const withGround = (line: LaneLine | null): DetectedLane | null =>
+      line
+        ? {
+            ...line,
+            ground: ctx ? laneToGround(line, ctx.intrinsics, ctx.profile.cameraHeight, ctx.pitch) : null,
+          }
+        : null;
+    useObjectStore.getState().setLanes({ left: withGround(state.left), right: withGround(state.right) });
   }
 
   private step(

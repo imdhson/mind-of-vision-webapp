@@ -94,3 +94,9 @@ export const IconSliders = (p: P) => (
     <circle cx="10" cy="17" r="2" />
   </Svg>
 );
+export const IconRoad = (p: P) => (
+  <Svg {...p}>
+    <path d="M9 4L4 20M15 4l5 16" />
+    <path d="M12 5v2.5M12 11v2.5M12 17v2" />
+  </Svg>
+);
