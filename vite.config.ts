@@ -49,7 +49,7 @@ export default defineConfig(({ mode }) => {
   if (mode === 'https') plugins.push(basicSsl());
 
   return {
-    base: './',
+    base: process.env.NODE_ENV === 'production' ? '/mind-of-vision-webapp/' : './',
     plugins,
     server: { host: mode === 'https' ? true : undefined },
     build: {
