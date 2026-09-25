@@ -195,8 +195,8 @@ export function Switch({
       >
         <span
           className={cx(
-            'absolute top-0.5 h-5 w-5 rounded-full shadow-sm transition-transform',
-            checked ? 'translate-x-5 bg-accent-fg' : 'translate-x-0.5 bg-surface',
+            'absolute top-0.5 left-0.5 h-5 w-5 rounded-full shadow-sm transition-transform',
+            checked ? 'translate-x-5 bg-accent-fg' : 'translate-x-0 bg-surface',
           )}
         />
       </button>
