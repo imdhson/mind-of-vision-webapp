@@ -33,7 +33,7 @@ export function SelectedObjectSheet({ context }: { context: 'camera' | 'vision' 
   if (!object) {
     if (endedLabel && visible) {
       return (
-        <div className="absolute inset-x-2 bottom-2 z-30 flex items-center justify-between rounded-xl bg-overlay px-3 py-2.5 text-[12.5px] backdrop-blur-xl">
+        <div className="absolute inset-x-2 bottom-2 z-30 flex items-center justify-between rounded-2xl bg-overlay px-3.5 py-3 text-[12.5px] font-medium shadow-lg backdrop-blur-xl">
           <span>{endedLabel}의 추적이 종료되었습니다.</span>
           <button type="button" className="p-1" aria-label="닫기" onClick={dismissEnded}>
             <IconClose size={16} />
@@ -46,10 +46,13 @@ export function SelectedObjectSheet({ context }: { context: 'camera' | 'vision' 
 
   return (
     <div
-      className="absolute inset-x-2 bottom-2 z-30 mx-auto max-w-xl rounded-2xl bg-overlay text-fg shadow-lg backdrop-blur-xl"
+      className="absolute inset-x-2 bottom-2 z-30 mx-auto max-w-xl rounded-[28px] bg-overlay text-fg shadow-xl backdrop-blur-xl"
       data-testid={`selected-sheet-${context}`}
     >
-      <div className="flex items-center gap-3 px-3.5 pb-2 pt-2.5">
+      <div className="flex justify-center pt-2.5">
+        <span className="h-1.5 w-10 rounded-full bg-muted/30" />
+      </div>
+      <div className="flex items-center gap-3 px-3.5 pb-2 pt-1.5">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
             <span className="truncate text-[14px] font-semibold" data-testid="selected-label">

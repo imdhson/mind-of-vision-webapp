@@ -50,14 +50,14 @@ function ObjectRow({ id, selected }: { id: string; selected: boolean }) {
     <li>
       <button
         type="button"
-        className={cx('flex w-full items-center gap-3 px-3 py-2.5 text-left', selected && 'bg-surface-2')}
+        className={cx('flex w-full items-center gap-3 px-3.5 py-3 text-left', selected && 'bg-accent-soft')}
         aria-expanded={selected}
         onClick={() => useObjectStore.getState().select(selected ? null : id)}
       >
         <span
           className={cx(
             'size-2 shrink-0 rounded-full',
-            o.trackingState === 'tracking' ? 'bg-fg' : 'border border-muted bg-transparent',
+            o.trackingState === 'tracking' ? 'bg-accent' : 'border border-muted bg-transparent',
           )}
         />
         <span className="min-w-0 flex-1">

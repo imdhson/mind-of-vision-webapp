@@ -180,7 +180,7 @@ export function CalibrationPanel({ object }: { object: TrackedObject }) {
 
   return (
     <div className="space-y-3" data-testid="calibration-panel">
-      <div className="flex items-baseline justify-between gap-2 rounded-lg bg-surface-2 px-3 py-2">
+      <div className="flex items-baseline justify-between gap-2 rounded-2xl bg-surface-2 px-3.5 py-2.5">
         <div className="text-[12px] text-muted">
           추정 <span className="tabular text-fg">{fmtDistance(object.estimatedDistance)}</span>
           <span className="mx-1.5">→</span>
@@ -215,7 +215,7 @@ export function CalibrationPanel({ object }: { object: TrackedObject }) {
           <label className="block">
             <span className="mb-1 block text-[12px] font-medium">보정 이름</span>
             <input
-              className="h-10 w-full rounded-lg border border-line bg-surface px-2.5 text-[14px] outline-none focus:border-fg"
+              className="h-11 w-full rounded-2xl bg-surface-2 px-3.5 text-[14px] outline-none ring-1 ring-inset ring-transparent focus:ring-accent"
               value={name}
               maxLength={40}
               onChange={(e) => setName(e.target.value)}
@@ -239,7 +239,7 @@ export function CalibrationPanel({ object }: { object: TrackedObject }) {
             type="checkbox"
             checked={preview}
             onChange={(e) => setPreview(e.target.checked)}
-            className="accent-current"
+            className="accent-accent"
           />
           입력 중 미리보기
         </label>

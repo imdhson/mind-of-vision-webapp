@@ -11,35 +11,38 @@
 }
 
 /*
- * 디자인 토큰 — 블랙/화이트/그레이만 사용 (초록 계열 포인트 컬러 없음)
+ * 디자인 토큰 — One UI(원 UI) 스타일: 파란색 포인트 컬러 + 밝은 회색/순수 블랙 배경,
+ * 카드형 표면과 둥근 모서리를 기본으로 합니다.
  * 시스템 테마(prefers-color-scheme)에 따라 자동 전환됩니다.
  */
 :root {
-  --bg: #f4f4f5;
+  --bg: #f2f3f5;
   --surface: #ffffff;
-  --surface-2: #ececee;
-  --fg: #0a0a0b;
-  --muted: #6b6b73;
-  --line: #d9d9de;
-  --accent: #0a0a0b;
+  --surface-2: #edeff2;
+  --fg: #191a1c;
+  --muted: #6f7378;
+  --line: #e3e5e9;
+  --accent: #1567ea;
   --accent-fg: #ffffff;
-  --danger: #b42318;
-  --overlay: rgba(255, 255, 255, 0.82);
+  --accent-soft: rgba(21, 103, 234, 0.1);
+  --danger: #e5473c;
+  --overlay: rgba(255, 255, 255, 0.85);
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0a0a0b;
-    --surface: #141416;
-    --surface-2: #1d1d20;
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface-2: #27272a;
     --fg: #f4f4f5;
-    --muted: #93939b;
-    --line: #2a2a2e;
-    --accent: #f4f4f5;
-    --accent-fg: #0a0a0b;
-    --danger: #ff7b72;
-    --overlay: rgba(12, 12, 14, 0.8);
+    --muted: #9a9da3;
+    --line: #303033;
+    --accent: #4c8dff;
+    --accent-fg: #ffffff;
+    --accent-soft: rgba(76, 141, 255, 0.16);
+    --danger: #ff6b60;
+    --overlay: rgba(18, 18, 20, 0.82);
     color-scheme: dark;
   }
 }
@@ -53,6 +56,7 @@
   --color-line: var(--line);
   --color-accent: var(--accent);
   --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
   --color-danger: var(--danger);
   --color-overlay: var(--overlay);
   --font-sans: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, -apple-system, 'Segoe UI', Roboto,

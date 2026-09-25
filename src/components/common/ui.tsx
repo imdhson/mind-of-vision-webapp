@@ -15,11 +15,11 @@ export function Button({
     <button
       type="button"
       className={cx(
-        'inline-flex h-9 min-w-9 select-none items-center justify-center gap-1.5 rounded-lg px-3 text-[13px] font-medium transition-colors disabled:opacity-40',
-        variant === 'primary' && 'bg-accent text-accent-fg active:opacity-80',
-        variant === 'outline' && 'border border-line bg-surface text-fg active:bg-surface-2',
+        'inline-flex h-9 min-w-9 select-none items-center justify-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold transition-colors disabled:opacity-40',
+        variant === 'primary' && 'bg-accent text-accent-fg shadow-sm active:opacity-85',
+        variant === 'outline' && 'bg-surface-2 text-fg active:bg-line',
         variant === 'ghost' && 'text-fg active:bg-surface-2',
-        variant === 'danger' && 'border border-line bg-surface text-danger active:bg-surface-2',
+        variant === 'danger' && 'bg-surface-2 text-danger active:bg-line',
         className,
       )}
       {...rest}
@@ -37,7 +37,7 @@ export function OverlayButton({
     <button
       type="button"
       className={cx(
-        'inline-flex h-10 min-w-10 items-center justify-center gap-1 rounded-full px-2.5 text-[12px] font-medium backdrop-blur-md transition-colors disabled:opacity-40',
+        'inline-flex h-11 min-w-11 items-center justify-center gap-1 rounded-full px-3 text-[12px] font-semibold shadow-sm backdrop-blur-md transition-colors disabled:opacity-40',
         active ? 'bg-accent text-accent-fg' : 'bg-overlay text-fg',
         className,
       )}
@@ -58,7 +58,7 @@ export function Segmented<T extends string>({
   className?: string;
 }) {
   return (
-    <div className={cx('flex rounded-lg bg-surface-2 p-0.5', className)} role="radiogroup">
+    <div className={cx('flex rounded-full bg-surface-2 p-1', className)} role="radiogroup">
       {options.map((o) => (
         <button
           key={o.value}
@@ -67,8 +67,8 @@ export function Segmented<T extends string>({
           aria-checked={value === o.value}
           onClick={() => onChange(o.value)}
           className={cx(
-            'min-h-8 flex-1 rounded-md px-2 text-[12px] font-medium transition-colors',
-            value === o.value ? 'bg-surface text-fg shadow-sm' : 'text-muted',
+            'min-h-8 flex-1 rounded-full px-2 text-[12px] font-semibold transition-colors',
+            value === o.value ? 'bg-surface text-accent shadow-sm' : 'text-muted',
           )}
         >
           {o.label}
@@ -130,8 +130,8 @@ export function NumberField({
       </div>
       <div
         className={cx(
-          'flex h-10 items-center rounded-lg border bg-surface px-2.5',
-          error ? 'border-danger' : 'border-line focus-within:border-fg',
+          'flex h-11 items-center rounded-2xl bg-surface-2 px-3 ring-1 ring-inset ring-transparent transition-colors',
+          error ? 'ring-danger' : 'focus-within:ring-accent',
           disabled && 'opacity-50',
         )}
       >
@@ -189,14 +189,14 @@ export function Switch({
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={cx(
-          'relative h-6 w-11 shrink-0 rounded-full border transition-colors',
-          checked ? 'border-accent bg-accent' : 'border-line bg-surface-2',
+          'relative h-7 w-12 shrink-0 rounded-full transition-colors',
+          checked ? 'bg-accent' : 'bg-surface-2',
         )}
       >
         <span
           className={cx(
-            'absolute top-0.5 left-0.5 h-5 w-5 rounded-full shadow-sm transition-transform',
-            checked ? 'translate-x-5 bg-accent-fg' : 'translate-x-0 bg-surface',
+            'absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow-md transition-transform',
+            checked ? 'translate-x-5' : 'translate-x-0',
           )}
         />
       </button>
@@ -219,11 +219,11 @@ export function Row({ k, v, sub }: { k: ReactNode; v: ReactNode; sub?: ReactNode
 export function Section({ title, right, children }: { title: ReactNode; right?: ReactNode; children: ReactNode }) {
   return (
     <section className="mb-4">
-      <div className="mb-1.5 flex items-center justify-between px-1">
-        <h2 className="text-[12px] font-semibold uppercase tracking-wide text-muted">{title}</h2>
+      <div className="mb-2 flex items-center justify-between px-2">
+        <h2 className="text-[13px] font-bold text-fg">{title}</h2>
         {right}
       </div>
-      <div className="rounded-xl border border-line bg-surface">{children}</div>
+      <div className="rounded-[22px] bg-surface shadow-sm">{children}</div>
     </section>
   );
 }
@@ -232,10 +232,10 @@ export function Badge({ children, tone = 'default' }: { children: ReactNode; ton
   return (
     <span
       className={cx(
-        'inline-flex items-center rounded px-1.5 py-px text-[10px] font-semibold',
+        'inline-flex items-center rounded-full px-2 py-px text-[10px] font-semibold',
         tone === 'default' && 'bg-surface-2 text-muted',
         tone === 'strong' && 'bg-accent text-accent-fg',
-        tone === 'danger' && 'bg-surface-2 text-danger',
+        tone === 'danger' && 'bg-danger/15 text-danger',
       )}
     >
       {children}

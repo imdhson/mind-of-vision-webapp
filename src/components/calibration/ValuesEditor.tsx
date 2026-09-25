@@ -24,7 +24,7 @@ export function ValuesEditor({
   return (
     <div className="space-y-2.5">
       {values.measuredDistance != null ? (
-        <div className="flex items-center justify-between rounded-lg bg-surface-2 px-3 py-2 text-[12px]">
+        <div className="flex items-center justify-between rounded-2xl bg-surface-2 px-3.5 py-2.5 text-[12px]">
           <span>
             실제 거리 기준 {fmtMeters(values.measuredDistance)}
             <span className="ml-1 text-muted">(당시 추정 {fmtMeters(values.referenceRawDistance)})</span>

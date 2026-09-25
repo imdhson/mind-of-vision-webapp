@@ -165,7 +165,7 @@ function RenameField({ initial, onSave }: { initial: string; onSave: (n: string)
   return (
     <div className="flex gap-2">
       <input
-        className="h-9 min-w-0 flex-1 rounded-lg border border-line bg-surface px-2.5 text-[13px] outline-none focus:border-fg"
+        className="h-9 min-w-0 flex-1 rounded-xl bg-surface-2 px-3 text-[13px] outline-none ring-1 ring-inset ring-transparent focus:ring-accent"
         value={name}
         maxLength={40}
         aria-label="보정 이름"
