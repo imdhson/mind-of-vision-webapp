@@ -10,7 +10,7 @@ type State = {
   activeDeviceId: string;
   cameraRunning: boolean;
   modelId: ModelId;
-  modelStatus: 'idle'|'loading'|'ready'|'error';
+  modelStatus: 'idle' | 'loading' | 'ready' | 'error';
   backend: string;
   message: string;
   setTab: (tab: TabId) => void;
@@ -20,18 +20,30 @@ type State = {
   setActiveDeviceId: (id: string) => void;
   setCameraRunning: (v: boolean) => void;
   setModelId: (id: ModelId) => void;
-  setModelState: (s: Partial<Pick<State,'modelStatus'|'backend'|'message'>>) => void;
+  setModelState: (s: Partial<Pick<State, 'modelStatus' | 'backend' | 'message'>>) => void;
 };
 
 export const useObjectStore = create<State>((set) => ({
-  tab: 'camera', objects: [], selectedId: null, cameraDevices: [], activeDeviceId: '', cameraRunning: false,
-  modelId: 'coco-ssd-lite', modelStatus: 'idle', backend: 'unknown', message: '',
+  tab: 'camera',
+  objects: [],
+  selectedId: null,
+  cameraDevices: [],
+  activeDeviceId: '',
+  cameraRunning: false,
+  modelId: 'coco-ssd-lite',
+  modelStatus: 'idle',
+  backend: 'unknown',
+  message: '',
   setTab: (tab) => set({ tab }),
-  setObjects: (objects) => set((s) => ({ objects, selectedId: s.selectedId && objects.some((o) => o.id === s.selectedId) ? s.selectedId : s.selectedId })),
+  setObjects: (objects) =>
+    set((s) => ({
+      objects,
+      selectedId: s.selectedId && objects.some((o) => o.id === s.selectedId) ? s.selectedId : s.selectedId,
+    })),
   select: (selectedId) => set({ selectedId }),
   setCameraDevices: (cameraDevices) => set({ cameraDevices }),
   setActiveDeviceId: (activeDeviceId) => set({ activeDeviceId }),
   setCameraRunning: (cameraRunning) => set({ cameraRunning }),
   setModelId: (modelId) => set({ modelId }),
-  setModelState: (s) => set(s)
+  setModelState: (s) => set(s),
 }));

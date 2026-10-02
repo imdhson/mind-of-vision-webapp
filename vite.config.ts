@@ -7,7 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig(({ mode }) => ({
   base: './',
   resolve: {
-    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) }
+    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
   plugins: [
     react(),
@@ -28,8 +28,8 @@ export default defineConfig(({ mode }) => ({
             options: {
               cacheName: 'mov-models',
               expiration: { maxEntries: 64 },
-              cacheableResponse: { statuses: [0, 200] }
-            }
+              cacheableResponse: { statuses: [0, 200] },
+            },
           },
           {
             urlPattern: /^https:\/\/storage\.googleapis\.com\/tfjs-models\//,
@@ -37,16 +37,16 @@ export default defineConfig(({ mode }) => ({
             options: {
               cacheName: 'tfjs-models',
               expiration: { maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 365 },
-              cacheableResponse: { statuses: [0, 200] }
-            }
-          }
-        ]
-      }
-    })
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
+      },
+    }),
   ],
   server: { https: mode === 'https' ? {} : undefined },
   test: {
     environment: 'jsdom',
-    setupFiles: ['./tests/unit/setup.ts']
-  }
+    setupFiles: ['./tests/unit/setup.ts'],
+  },
 }));

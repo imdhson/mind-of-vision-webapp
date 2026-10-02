@@ -13,7 +13,9 @@ export class VisionPipeline {
   private timer = 0;
   maxFps = 14;
 
-  async init(modelId?: ModelId) { await this.detector.init(modelId); }
+  async init(modelId?: ModelId) {
+    await this.detector.init(modelId);
+  }
   start(args: {
     video: HTMLVideoElement;
     profile: () => CameraProfile;
@@ -22,7 +24,9 @@ export class VisionPipeline {
     onObjects: (objects: SpatialObject[]) => void;
     onError: (error: unknown) => void;
   }) {
-    this.stop(); this.running = true; const generation = ++this.generation;
+    this.stop();
+    this.running = true;
+    const generation = ++this.generation;
     const loop = async () => {
       if (!this.running || generation !== this.generation) return;
       const started = performance.now();
@@ -31,16 +35,28 @@ export class VisionPipeline {
         const detections = await this.detector.detect(video);
         if (!this.running || generation !== this.generation) return;
         const tracks = this.tracker.update(detections);
-        const objects = tracks.map((t) => buildSpatialObject(t, {
-          width: video.videoWidth || 1280, height: video.videoHeight || 720,
-          profile: args.profile(), liveTiltDeg: args.liveTiltDeg(), calibration: args.calibration
-        }));
+        const objects = tracks.map((t) =>
+          buildSpatialObject(t, {
+            width: video.videoWidth || 1280,
+            height: video.videoHeight || 720,
+            profile: args.profile(),
+            liveTiltDeg: args.liveTiltDeg(),
+            calibration: args.calibration,
+          }),
+        );
         args.onObjects(objects);
-      } catch (e) { args.onError(e); }
+      } catch (e) {
+        args.onError(e);
+      }
       const delay = Math.max(0, 1000 / this.maxFps - (performance.now() - started));
       this.timer = window.setTimeout(loop, delay);
     };
     loop();
   }
-  stop() { this.running = false; this.generation++; clearTimeout(this.timer); this.tracker.clear(); }
+  stop() {
+    this.running = false;
+    this.generation++;
+    clearTimeout(this.timer);
+    this.tracker.clear();
+  }
 }

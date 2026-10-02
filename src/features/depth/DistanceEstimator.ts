@@ -12,9 +12,9 @@ export function estimateDistance(args: {
   const { bbox, frameHeight, objectHeightM, profile } = args;
   const fov = degToRad(clamp(profile.fovDeg, 20, 140));
   const focalPx = frameHeight / (2 * Math.tan(fov / 2));
-  const sizeDistance = (objectHeightM * focalPx / Math.max(3, bbox.height)) * profile.distanceScale;
+  const sizeDistance = ((objectHeightM * focalPx) / Math.max(3, bbox.height)) * profile.distanceScale;
   const bottom = (bbox.y + bbox.height) / Math.max(1, frameHeight);
-  const imageAngle = Math.atan(((bottom - 0.5) * 2) * Math.tan(fov / 2));
+  const imageAngle = Math.atan((bottom - 0.5) * 2 * Math.tan(fov / 2));
   const tilt = degToRad(profile.useTiltSensor ? (args.liveTiltDeg ?? profile.tiltDeg) : profile.tiltDeg);
   const downAngle = imageAngle + tilt;
   let distance = sizeDistance;

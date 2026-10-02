@@ -9,8 +9,14 @@ import { useDevicePitch } from '@/hooks/useDeviceOrientation';
 import { useWakeLock } from '@/hooks/useWakeLock';
 
 const Ctx = createContext<ReturnType<typeof makeContext> | null>(null);
-function makeContext(camera: CameraManager, pipeline: VisionPipeline, calibration: CalibrationManager) { return { camera, pipeline, calibration }; }
-export function useRuntime() { const v = useContext(Ctx); if (!v) throw new Error('Runtime missing'); return v; }
+function makeContext(camera: CameraManager, pipeline: VisionPipeline, calibration: CalibrationManager) {
+  return { camera, pipeline, calibration };
+}
+export function useRuntime() {
+  const v = useContext(Ctx);
+  if (!v) throw new Error('Runtime missing');
+  return v;
+}
 
 export function AppRuntime({ children }: { children: ReactNode }) {
   const camera = useMemo(() => new CameraManager(), []);
@@ -22,15 +28,24 @@ export function AppRuntime({ children }: { children: ReactNode }) {
   const pitch = useDevicePitch();
   useWakeLock(true);
 
-  useEffect(() => { calibration.init(); return () => { pipeline.stop(); camera.stop(); }; }, [calibration, pipeline, camera]);
+  useEffect(() => {
+    calibration.init();
+    return () => {
+      pipeline.stop();
+      camera.stop();
+    };
+  }, [calibration, pipeline, camera]);
   useEffect(() => {
     (window as any).__MOV_RUNTIME__ = { ...ctx, videoRef, profile, setProfile, pitch };
-    return () => { delete (window as any).__MOV_RUNTIME__; };
+    return () => {
+      delete (window as any).__MOV_RUNTIME__;
+    };
   }, [ctx, profile, pitch]);
 
   useEffect(() => {
     const onDevice = async () => useObjectStore.getState().setCameraDevices(await camera.refreshDevices());
-    navigator.mediaDevices?.addEventListener?.('devicechange', onDevice); onDevice().catch(() => {});
+    navigator.mediaDevices?.addEventListener?.('devicechange', onDevice);
+    onDevice().catch(() => {});
     return () => navigator.mediaDevices?.removeEventListener?.('devicechange', onDevice);
   }, [camera]);
 
@@ -39,7 +54,7 @@ export function AppRuntime({ children }: { children: ReactNode }) {
 
 export function runtimeExtras() {
   return (window as any).__MOV_RUNTIME__ as {
-    videoRef: React.MutableRefObject<HTMLVideoElement|null>;
+    videoRef: React.MutableRefObject<HTMLVideoElement | null>;
     profile: CameraProfile;
     setProfile: React.Dispatch<React.SetStateAction<CameraProfile>>;
     pitch?: number;

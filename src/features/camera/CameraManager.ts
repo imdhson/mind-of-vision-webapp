@@ -17,7 +17,9 @@ export class CameraManager {
     this.stop();
     const constraints: MediaStreamConstraints = {
       audio: false,
-      video: deviceId ? { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } } : { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+      video: deviceId
+        ? { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
+        : { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
     };
     this.stream = await navigator.mediaDevices.getUserMedia(constraints);
     this.generation++;
@@ -29,17 +31,25 @@ export class CameraManager {
     return settings;
   }
 
-  async switch(video: HTMLVideoElement, deviceId: string) { return this.start(video, deviceId); }
+  async switch(video: HTMLVideoElement, deviceId: string) {
+    return this.start(video, deviceId);
+  }
 
   async setZoom(value: number) {
-    const track = this.stream?.getVideoTracks()[0]; if (!track) return;
-    const caps = track.getCapabilities?.() as MediaTrackCapabilities & { zoom?: { min: number; max: number; step: number } };
+    const track = this.stream?.getVideoTracks()[0];
+    if (!track) return;
+    const caps = track.getCapabilities?.() as MediaTrackCapabilities & {
+      zoom?: { min: number; max: number; step: number };
+    };
     if (!caps?.zoom) return;
-    await track.applyConstraints({ advanced: [{ zoom: Math.max(caps.zoom.min, Math.min(caps.zoom.max, value)) } as MediaTrackConstraintSet] });
+    await track.applyConstraints({
+      advanced: [{ zoom: Math.max(caps.zoom.min, Math.min(caps.zoom.max, value)) } as MediaTrackConstraintSet],
+    });
   }
 
   stop() {
     this.stream?.getTracks().forEach((t) => t.stop());
-    this.stream = null; this.generation++;
+    this.stream = null;
+    this.generation++;
   }
 }

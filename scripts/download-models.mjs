@@ -4,7 +4,9 @@ import path from 'node:path';
 const all = process.argv.includes('--all');
 const models = [
   ['coco-ssd-lite', 'https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/model.json'],
-  ...(all ? [['coco-ssd-mobilenet-v2', 'https://storage.googleapis.com/tfjs-models/savedmodel/ssd_mobilenet_v2/model.json']] : [])
+  ...(all
+    ? [['coco-ssd-mobilenet-v2', 'https://storage.googleapis.com/tfjs-models/savedmodel/ssd_mobilenet_v2/model.json']]
+    : []),
 ];
 
 async function download(url, out) {

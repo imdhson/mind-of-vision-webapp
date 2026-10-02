@@ -21,7 +21,10 @@ export class ObjectDetector {
     }
     const def = MODEL_REGISTRY[modelId];
     try {
-      this.model = await cocoSsd.load({ base: def.base, modelUrl: new URL(def.localPath, document.baseURI).toString() });
+      this.model = await cocoSsd.load({
+        base: def.base,
+        modelUrl: new URL(def.localPath, document.baseURI).toString(),
+      });
     } catch {
       this.model = await cocoSsd.load({ base: def.base });
     }
@@ -39,7 +42,7 @@ export class ObjectDetector {
     return result.map((d) => ({
       className: d.class,
       score: d.score,
-      bbox: { x: d.bbox[0], y: d.bbox[1], width: d.bbox[2], height: d.bbox[3] }
+      bbox: { x: d.bbox[0], y: d.bbox[1], width: d.bbox[2], height: d.bbox[3] },
     }));
   }
 }

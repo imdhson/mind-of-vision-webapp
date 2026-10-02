@@ -5,4 +5,10 @@ import App from './App';
 import { AppRuntime } from '@/app/AppRuntime';
 import '@/styles/globals.css';
 registerSW({ immediate: true });
-ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><AppRuntime><App/></AppRuntime></React.StrictMode>);
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <AppRuntime>
+      <App />
+    </AppRuntime>
+  </React.StrictMode>,
+);

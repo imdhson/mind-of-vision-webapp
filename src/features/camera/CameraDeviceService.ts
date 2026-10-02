@@ -11,10 +11,12 @@ export function classifyLens(label: string): CameraDevice['kind'] {
 }
 export async function listVideoDevices(): Promise<CameraDevice[]> {
   const all = await navigator.mediaDevices.enumerateDevices();
-  return all.filter((d) => d.kind === 'videoinput').map((d) => ({
-    deviceId: d.deviceId,
-    groupId: d.groupId,
-    label: d.label || '카메라',
-    kind: classifyLens(d.label)
-  }));
+  return all
+    .filter((d) => d.kind === 'videoinput')
+    .map((d) => ({
+      deviceId: d.deviceId,
+      groupId: d.groupId,
+      label: d.label || '카메라',
+      kind: classifyLens(d.label),
+    }));
 }

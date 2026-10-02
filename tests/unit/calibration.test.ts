@@ -1,3 +1,25 @@
-import { describe,it,expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { CalibrationManager } from '@/features/calibration/CalibrationManager';
-describe('calibration',()=>{it('validates ranges',()=>{const m=new CalibrationManager();expect(()=>m.validate({actualDistance:0})).toThrow('actualDistance 값이 허용 범위를 벗어났습니다.');expect(()=>m.validate({actualDistance:3})).not.toThrow()});it('temporary has highest priority',()=>{const m=new CalibrationManager();m.records=[{id:'class:person',scope:'class',key:'person',className:'person',values:{distanceOffset:1},createdAt:0,updatedAt:0}];m.setTemp('person-1',{distanceOffset:2});expect(m.resolve('person-1','person').source).toBe('temporary')})});
+describe('calibration', () => {
+  it('validates ranges', () => {
+    const m = new CalibrationManager();
+    expect(() => m.validate({ actualDistance: 0 })).toThrow('actualDistance 값이 허용 범위를 벗어났습니다.');
+    expect(() => m.validate({ actualDistance: 3 })).not.toThrow();
+  });
+  it('temporary has highest priority', () => {
+    const m = new CalibrationManager();
+    m.records = [
+      {
+        id: 'class:person',
+        scope: 'class',
+        key: 'person',
+        className: 'person',
+        values: { distanceOffset: 1 },
+        createdAt: 0,
+        updatedAt: 0,
+      },
+    ];
+    m.setTemp('person-1', { distanceOffset: 2 });
+    expect(m.resolve('person-1', 'person').source).toBe('temporary');
+  });
+});
