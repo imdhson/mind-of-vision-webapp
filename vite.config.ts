@@ -44,7 +44,13 @@ export default defineConfig(({ mode }) => ({
       },
     }),
   ],
-  server: { https: mode === 'https' ? {} : undefined },
+  server: {
+    https: mode === 'https' ? {} : undefined,
+    allowedHosts: ['vision.cciicc.cc'],
+  },
+  preview: {
+    allowedHosts: ['vision.cciicc.cc'],
+  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./tests/unit/setup.ts'],
