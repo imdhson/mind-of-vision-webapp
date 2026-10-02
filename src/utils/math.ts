@@ -1,47 +1,18 @@
-export const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
-
+import type { BBox } from '@/types';
+export const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+export const degToRad = (v: number) => v * Math.PI / 180;
+export const radToDeg = (v: number) => v * 180 / Math.PI;
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-export const DEG = Math.PI / 180;
-
-/** 각도를 (-π, π] 로 정규화 */
-export function wrapAngle(a: number): number {
-  let r = a % (2 * Math.PI);
-  if (r <= -Math.PI) r += 2 * Math.PI;
-  if (r > Math.PI) r -= 2 * Math.PI;
-  return r;
+export function iou(a: BBox, b: BBox) {
+  const x1 = Math.max(a.x, b.x), y1 = Math.max(a.y, b.y);
+  const x2 = Math.min(a.x + a.width, b.x + b.width), y2 = Math.min(a.y + a.height, b.y + b.height);
+  const inter = Math.max(0, x2 - x1) * Math.max(0, y2 - y1);
+  const union = a.width * a.height + b.width * b.height - inter;
+  return union > 0 ? inter / union : 0;
 }
-
-/** 최단 경로로 각도 보간 */
-export function lerpAngle(a: number, b: number, t: number): number {
-  return a + wrapAngle(b - a) * t;
-}
-
-/**
- * 프레임레이트와 무관한 지수 감쇠 계수.
- * timeConstant(초) 동안 목표까지 약 63% 도달합니다.
- */
-export function dampFactor(dt: number, timeConstant: number): number {
-  if (timeConstant <= 0) return 1;
-  return 1 - Math.exp(-dt / timeConstant);
-}
-
-export function isFiniteNumber(v: unknown): v is number {
-  return typeof v === 'number' && Number.isFinite(v);
-}
-
-export function median(values: number[]): number {
-  if (values.length === 0) return NaN;
-  const s = [...values].sort((a, b) => a - b);
-  const m = s.length >> 1;
-  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
-}
-
-export function quantile(values: number[], q: number): number {
-  if (values.length === 0) return NaN;
-  const s = [...values].sort((a, b) => a - b);
-  const pos = clamp(q, 0, 1) * (s.length - 1);
-  const lo = Math.floor(pos);
-  const hi = Math.ceil(pos);
-  return lerp(s[lo], s[hi], pos - lo);
+export function centerDistance(a: BBox, b: BBox) {
+  const ax = a.x + a.width / 2, ay = a.y + a.height / 2;
+  const bx = b.x + b.width / 2, by = b.y + b.height / 2;
+  return Math.hypot(ax - bx, ay - by);
 }
