@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react", "import", "vitest"],
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "vitest/require-mock-type-parameters": "off",
+    "react/set-state-in-effect": "warn",
+    "react/immutability": "warn",
+    "react/use-memo": "warn"
+  },
+  "ignorePatterns": ["dist", "dev-dist", "public", "tests/e2e/output"]
+}

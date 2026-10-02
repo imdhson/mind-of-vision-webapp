@@ -1,8 +1,7 @@
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import type { SpatialObject } from '@/types';
 export function AutoCameraController({ objects, enabled }: { objects: SpatialObject[]; enabled:boolean }) {
-  const { camera } = useThree();
-  useFrame(() => {
+  useFrame(({ camera }) => {
     if (!enabled) return;
     const far = Math.max(5, ...objects.map((o)=>Math.hypot(o.position.x,o.position.z)));
     const targetZ = Math.min(32, Math.max(8, far * 1.25 + 6));

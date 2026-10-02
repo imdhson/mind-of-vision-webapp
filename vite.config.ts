@@ -18,8 +18,19 @@ export default defineConfig(({ mode }) => ({
       manifest: false,
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,webmanifest,json}'],
+        globIgnores: ['models/**'],
         maximumFileSizeToCacheInBytes: 80 * 1024 * 1024,
         runtimeCaching: [
+          {
+            // 앱과 함께 배포된 로컬 모델: 최초 로드 시 캐시 → 이후 오프라인 사용
+            urlPattern: ({ url }) => url.pathname.includes('/models/'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'mov-models',
+              expiration: { maxEntries: 64 },
+              cacheableResponse: { statuses: [0, 200] }
+            }
+          },
           {
             urlPattern: /^https:\/\/storage\.googleapis\.com\/tfjs-models\//,
             handler: 'CacheFirst',

@@ -19,7 +19,12 @@ export class ObjectDetector {
       await tf.ready();
       this.backend = tf.getBackend();
     }
-    this.model = await cocoSsd.load({ base: MODEL_REGISTRY[modelId].base });
+    const def = MODEL_REGISTRY[modelId];
+    try {
+      this.model = await cocoSsd.load({ base: def.base, modelUrl: new URL(def.localPath, document.baseURI).toString() });
+    } catch {
+      this.model = await cocoSsd.load({ base: def.base });
+    }
   }
 
   async switchModel(modelId: ModelId) {

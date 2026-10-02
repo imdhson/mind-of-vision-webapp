@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useObjectStore } from '@/stores/objectStore';
 import { useRuntime, runtimeExtras, profileForCurrentCamera } from '@/app/AppRuntime';
 import { DetectionOverlay } from './DetectionOverlay';
@@ -6,6 +6,8 @@ import { DetectionOverlay } from './DetectionOverlay';
 export function CameraTab({ active }: { active: boolean }) {
   const { camera, pipeline, calibration } = useRuntime();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
+  const setVideoRef = useCallback((el: HTMLVideoElement | null) => { videoRef.current = el; setVideoEl(el); }, []);
   const [error, setError] = useState('');
   const s = useObjectStore();
 
@@ -41,8 +43,8 @@ export function CameraTab({ active }: { active: boolean }) {
       {s.cameraRunning ? <button onClick={stop}>중지</button> : <button onClick={()=>start(s.activeDeviceId || undefined)}>시작</button>}
     </div>
     <div className="camera-stage">
-      <video ref={videoRef} muted playsInline autoPlay />
-      <DetectionOverlay objects={s.objects} video={videoRef.current} onSelect={s.select}/>
+      <video ref={setVideoRef} muted playsInline autoPlay />
+      <DetectionOverlay objects={s.objects} video={videoEl} onSelect={s.select}/>
       {!s.cameraRunning && <div className="empty-state">카메라를 시작하면 객체 인식이 표시됩니다.</div>}
       {!!error && <div className="error-banner">{error}</div>}
     </div>

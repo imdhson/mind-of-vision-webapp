@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { CalibrationValues, SpatialObject } from '@/types';
 import { useRuntime } from '@/app/AppRuntime';
 
@@ -10,7 +10,8 @@ export function CalibrationPanel({ object, onApplied }: { object:SpatialObject; 
   const { calibration } = useRuntime();
   const [scope, setScope] = useState<'temporary'|'object'|'class'>('temporary');
   const [values, setValues] = useState<CalibrationValues>({}); const [message,setMessage]=useState('');
-  useEffect(()=>{setValues({});setMessage('');},[object.id]);
+  const [prevId, setPrevId] = useState(object.id);
+  if (prevId !== object.id) { setPrevId(object.id); setValues({}); setMessage(''); }
   function change(k:keyof CalibrationValues,v:string){setValues((s)=>({...s,[k]:v===''?undefined:Number(v)}));}
   async function apply(){
     try { calibration.validate(values); if(scope==='temporary') calibration.setTemp(object.id,values); else await calibration.save(scope,scope==='object'?object.id:object.className,object.className,values); setMessage('적용했습니다.');onApplied(); }
