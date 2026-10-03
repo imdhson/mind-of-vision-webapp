@@ -19,6 +19,7 @@ export function CameraTab({ active }: { active: boolean }) {
       cameraDevices: state.cameraDevices,
       cameraRunning: state.cameraRunning,
       modelId: state.modelId,
+      modelStatus: state.modelStatus,
       setModelState: state.setModelState,
       setActiveDeviceId: state.setActiveDeviceId,
       setCameraDevices: state.setCameraDevices,
