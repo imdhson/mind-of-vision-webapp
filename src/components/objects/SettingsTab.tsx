@@ -1,13 +1,24 @@
 import { useEffect, useState } from 'react';
 import { useObjectStore } from '@/stores/objectStore';
+import { useShallow } from 'zustand/react/shallow';
 import { CameraSettings } from '@/components/calibration/CameraSettings';
 import { SavedCalibrationManager } from '@/components/calibration/SavedCalibrationManager';
 import { MODEL_REGISTRY, type ModelId } from '@/features/detection/ModelLoader';
 import { useRuntime } from '@/app/AppRuntime';
 export function SettingsTab({ active }: { active: boolean }) {
-  const s = useObjectStore();
+  const s = useObjectStore(
+    useShallow((state) => ({
+      selectedId: state.selectedId,
+      modelId: state.modelId,
+      backend: state.backend,
+      modelStatus: state.modelStatus,
+      select: state.select,
+      setModelId: state.setModelId,
+      setModelState: state.setModelState,
+    })),
+  );
   const { pipeline } = useRuntime();
-  const [snapshot, setSnapshot] = useState(s.objects);
+  const [snapshot, setSnapshot] = useState(() => useObjectStore.getState().objects);
   useEffect(() => {
     if (!active || s.selectedId) return;
     const refresh = () => setSnapshot(useObjectStore.getState().objects);

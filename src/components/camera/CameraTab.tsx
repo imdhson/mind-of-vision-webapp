@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useObjectStore } from '@/stores/objectStore';
+import { useShallow } from 'zustand/react/shallow';
 import { useRuntime, runtimeExtras, profileForCurrentCamera } from '@/app/AppRuntime';
 import { DetectionOverlay } from './DetectionOverlay';
 
@@ -12,7 +13,19 @@ export function CameraTab({ active }: { active: boolean }) {
     setVideoEl(el);
   }, []);
   const [error, setError] = useState('');
-  const s = useObjectStore();
+  const s = useObjectStore(
+    useShallow((state) => ({
+      activeDeviceId: state.activeDeviceId,
+      cameraDevices: state.cameraDevices,
+      cameraRunning: state.cameraRunning,
+      modelId: state.modelId,
+      setModelState: state.setModelState,
+      setActiveDeviceId: state.setActiveDeviceId,
+      setCameraDevices: state.setCameraDevices,
+      setCameraRunning: state.setCameraRunning,
+      setObjects: state.setObjects,
+    })),
+  );
 
   useEffect(() => {
     const rt = runtimeExtras();
@@ -81,7 +94,7 @@ export function CameraTab({ active }: { active: boolean }) {
       </div>
       <div className="camera-stage">
         <video ref={setVideoRef} muted playsInline autoPlay />
-        <DetectionOverlay objects={s.objects} video={videoEl} onSelect={s.select} />
+        <DetectionOverlay video={videoEl} />
         {!s.cameraRunning && <div className="empty-state">카메라를 시작하면 객체 인식이 표시됩니다.</div>}
         {!!error && <div className="error-banner">{error}</div>}
       </div>

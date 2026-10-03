@@ -1,0 +1,3 @@
+## 2024-10-03 - Zustand un-select re-render issue
+**Learning:** Using `useObjectStore()` without a selector in Zustand causes the component to re-render whenever *any* field in the store updates. In an app where some state (like object detection frames) updates 14+ times per second, this anti-pattern accidentally forces UI components (like `BottomTabs` and `SettingsTab`) to re-render at that same 14fps rate, even if they explicitly try to throttle renders using a local snapshot.
+**Action:** Always use specific selectors (e.g., `useObjectStore(s => s.tab)`) or `useShallow` when pulling from a fast-updating global store, especially in passive UI components.

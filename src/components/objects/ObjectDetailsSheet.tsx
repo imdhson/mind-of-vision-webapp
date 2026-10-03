@@ -1,9 +1,11 @@
 import { useObjectStore } from '@/stores/objectStore';
 import { radToDeg } from '@/utils/math';
 import { CalibrationPanel } from '@/components/calibration/CalibrationPanel';
+
 export function ObjectDetailsSheet() {
-  const s = useObjectStore();
-  const o = s.objects.find((x) => x.id === s.selectedId);
+  const selectedId = useObjectStore((s) => s.selectedId);
+  const o = useObjectStore((s) => (selectedId ? s.objects.find((x) => x.id === selectedId) : undefined));
+  const select = useObjectStore((s) => s.select);
   if (!o) return null;
   return (
     <aside className="details-sheet">
@@ -12,7 +14,7 @@ export function ObjectDetailsSheet() {
           <strong>{o.label}</strong>
           <span>{o.id}</span>
         </div>
-        <button onClick={() => s.select(null)}>닫기</button>
+        <button onClick={() => select(null)}>닫기</button>
       </div>
       <dl>
         <dt>신뢰도</dt>
