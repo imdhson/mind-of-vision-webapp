@@ -62,9 +62,10 @@ export function CameraTab({ active }: { active: boolean }) {
       <div className="thin-toolbar">
         <div className="toolbar-title">카메라</div>
         <select
+          aria-label="카메라 선택"
           value={s.activeDeviceId}
           onChange={(e) => switchDevice(e.target.value)}
-          disabled={!s.cameraDevices.length}
+          disabled={!s.cameraDevices.length || s.modelStatus === 'loading'}
         >
           <option value="">자동 카메라</option>
           {s.cameraDevices.map((d) => (
@@ -76,7 +77,13 @@ export function CameraTab({ active }: { active: boolean }) {
         {s.cameraRunning ? (
           <button onClick={stop}>중지</button>
         ) : (
-          <button onClick={() => start(s.activeDeviceId || undefined)}>시작</button>
+          <button
+            onClick={() => start(s.activeDeviceId || undefined)}
+            disabled={s.modelStatus === 'loading'}
+            aria-busy={s.modelStatus === 'loading'}
+          >
+            {s.modelStatus === 'loading' ? '로딩 중…' : '시작'}
+          </button>
         )}
       </div>
       <div className="camera-stage">

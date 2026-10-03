@@ -54,7 +54,12 @@ export function SettingsTab({ active }: { active: boolean }) {
         </div>
         <div className="panel-block">
           <h3>AI 모델</h3>
-          <select value={s.modelId} onChange={(e) => model(e.target.value as ModelId)}>
+          <select
+            aria-label="AI 모델 선택"
+            value={s.modelId}
+            onChange={(e) => model(e.target.value as ModelId)}
+            disabled={s.modelStatus === 'loading'}
+          >
             {Object.entries(MODEL_REGISTRY).map(([id, m]) => (
               <option key={id} value={id}>
                 {m.label}
