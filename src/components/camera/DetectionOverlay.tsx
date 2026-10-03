@@ -1,13 +1,8 @@
-import type { SpatialObject } from '@/types';
-export function DetectionOverlay({
-  objects,
-  video,
-  onSelect,
-}: {
-  objects: SpatialObject[];
-  video: HTMLVideoElement | null;
-  onSelect: (id: string) => void;
-}) {
+import { useObjectStore } from '@/stores/objectStore';
+
+export function DetectionOverlay({ video }: { video: HTMLVideoElement | null }) {
+  const objects = useObjectStore((s) => s.objects);
+  const onSelect = useObjectStore((s) => s.select);
   const w = video?.videoWidth || 1,
     h = video?.videoHeight || 1;
   return (

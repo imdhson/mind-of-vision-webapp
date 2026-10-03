@@ -1,12 +1,19 @@
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Grid } from '@react-three/drei';
 import { useObjectStore } from '@/stores/objectStore';
+import { useShallow } from 'zustand/react/shallow';
 import { ObjectRenderer } from './ObjectRenderer';
 import { UserMarker } from './UserMarker';
 import { AutoCameraController } from './AutoCameraController';
 
 export function VisionScene({ active }: { active: boolean }) {
-  const { objects, selectedId, select } = useObjectStore();
+  const { objects, selectedId, select } = useObjectStore(
+    useShallow((state) => ({
+      objects: state.objects,
+      selectedId: state.selectedId,
+      select: state.select,
+    })),
+  );
   return (
     <Canvas
       className="vision-canvas"
