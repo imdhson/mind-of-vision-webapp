@@ -16,9 +16,12 @@ export function SavedCalibrationManager() {
                 {r.scope === 'class' ? '클래스' : '객체'} · {r.className}
               </span>
               <button
+                aria-label={`${r.scope === 'class' ? '클래스' : '객체'} ${r.className} 보정 삭제`}
                 onClick={async () => {
-                  await calibration.remove(r.id);
-                  redraw((x) => x + 1);
+                  if (window.confirm(`${r.className} 보정을 삭제하시겠습니까?`)) {
+                    await calibration.remove(r.id);
+                    redraw((x) => x + 1);
+                  }
                 }}
               >
                 삭제
