@@ -36,7 +36,8 @@ export function SettingsTab({ active }: { active: boolean }) {
       await pipeline.detector.switchModel(id);
       s.setModelState({ modelStatus: 'ready', backend: pipeline.detector.backend, message: '' });
     } catch (e) {
-      s.setModelState({ modelStatus: 'error', message: String(e) });
+      console.error('Model switch error:', e);
+      s.setModelState({ modelStatus: 'error', message: '모델 변경 중 오류가 발생했습니다.' });
     }
   }
   return (

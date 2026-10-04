@@ -34,7 +34,8 @@ export function CalibrationPanel({ object, onApplied }: { object: SpatialObject;
       setMessage('적용했습니다.');
       onApplied();
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : String(e));
+      console.error('Calibration apply error:', e);
+      setMessage('보정값 적용 중 오류가 발생했습니다.');
     }
   }
   return (
