@@ -53,10 +53,14 @@ export function CameraTab({ active }: { active: boolean }) {
         liveTiltDeg: () => runtimeExtras().pitch,
         calibration,
         onObjects: (objects) => useObjectStore.getState().setObjects(objects),
-        onError: (e) => useObjectStore.getState().setModelState({ message: String(e) }),
+        onError: (e) => {
+          console.error('Pipeline error:', e);
+          useObjectStore.getState().setModelState({ message: '파이프라인 실행 중 오류가 발생했습니다.' });
+        },
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      console.error('Camera start error:', e);
+      setError('카메라 시작 중 오류가 발생했습니다.');
       s.setModelState({ modelStatus: 'error' });
     }
   }
