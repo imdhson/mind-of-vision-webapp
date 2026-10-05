@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useObjectStore } from '@/stores/objectStore';
 import { radToDeg } from '@/utils/math';
 import { CalibrationPanel } from '@/components/calibration/CalibrationPanel';
@@ -6,15 +7,27 @@ export function ObjectDetailsSheet() {
   const selectedId = useObjectStore((s) => s.selectedId);
   const o = useObjectStore((s) => (selectedId ? s.objects.find((x) => x.id === selectedId) : undefined));
   const select = useObjectStore((s) => s.select);
+
+  useEffect(() => {
+    if (!o) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') select(null);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [o, select]);
+
   if (!o) return null;
   return (
-    <aside className="details-sheet">
+    <aside className="details-sheet" role="dialog" aria-labelledby="details-sheet-title" aria-modal="false">
       <div className="sheet-head">
         <div>
-          <strong>{o.label}</strong>
+          <strong id="details-sheet-title">{o.label}</strong>
           <span>{o.id}</span>
         </div>
-        <button onClick={() => select(null)}>닫기</button>
+        <button onClick={() => select(null)} aria-label="닫기 (Escape)" title="닫기 (Escape)">
+          닫기
+        </button>
       </div>
       <dl>
         <dt>신뢰도</dt>
