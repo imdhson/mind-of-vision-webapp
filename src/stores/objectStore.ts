@@ -36,10 +36,14 @@ export const useObjectStore = create<State>((set) => ({
   message: '',
   setTab: (tab) => set({ tab }),
   setObjects: (objects) =>
-    set((s) => ({
-      objects,
-      selectedId: s.selectedId && objects.some((o) => o.id === s.selectedId) ? s.selectedId : s.selectedId,
-    })),
+    set((s) => {
+      // Performance optimization: prevent update if both are empty
+      if (objects.length === 0 && s.objects.length === 0) return s;
+      return {
+        objects,
+        selectedId: s.selectedId && objects.some((o) => o.id === s.selectedId) ? s.selectedId : s.selectedId,
+      };
+    }),
   select: (selectedId) => set({ selectedId }),
   setCameraDevices: (cameraDevices) => set({ cameraDevices }),
   setActiveDeviceId: (activeDeviceId) => set({ activeDeviceId }),
