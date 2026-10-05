@@ -6,7 +6,7 @@ import { ObjectRenderer } from './ObjectRenderer';
 import { UserMarker } from './UserMarker';
 import { AutoCameraController } from './AutoCameraController';
 
-export function VisionScene({ active }: { active: boolean }) {
+function ObjectsLayer() {
   const { objects, selectedId, select } = useObjectStore(
     useShallow((state) => ({
       objects: state.objects,
@@ -14,6 +14,19 @@ export function VisionScene({ active }: { active: boolean }) {
       select: state.select,
     })),
   );
+
+  return (
+    <>
+      {objects.map((o) => (
+        <ObjectRenderer key={o.id} object={o} selected={o.id === selectedId} onSelect={() => select(o.id)} />
+      ))}
+      <AutoCameraController objects={objects} enabled={!selectedId} />
+    </>
+  );
+}
+
+export function VisionScene({ active }: { active: boolean }) {
+  const select = useObjectStore((s) => s.select);
   return (
     <Canvas
       className="vision-canvas"
@@ -44,10 +57,7 @@ export function VisionScene({ active }: { active: boolean }) {
         </mesh>
       ))}
       <UserMarker />
-      {objects.map((o) => (
-        <ObjectRenderer key={o.id} object={o} selected={o.id === selectedId} onSelect={() => select(o.id)} />
-      ))}
-      <AutoCameraController objects={objects} enabled={!selectedId} />
+      <ObjectsLayer />
       <OrbitControls
         enableDamping
         dampingFactor={0.05}
