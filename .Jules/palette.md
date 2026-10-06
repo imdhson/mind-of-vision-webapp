@@ -9,3 +9,7 @@
 ## 2023-10-05 - Escape Key Dismissal for Floating Sheets
 **Learning:** Floating sheets/modals over immersive scenes (3D/Camera) need quick keyboard dismissal (Escape key). Users get frustrated when forced to click a small "close" button, especially when interacting with rapid live object data.
 **Action:** Always add a global Escape key listener to dismiss temporary overlays/sheets (`role="dialog"`), and update the close button with `aria-label` and `title` to hint at the keyboard shortcut.
+
+## 2026-10-06 - Empty State CTAs & Alert Accessibility
+**Learning:** Absolute-positioned error banners and empty states often fail to register with screen readers unless explicit ARIA attributes are used. Additionally, placing primary actions inside central empty state areas improves discoverability compared to small toolbar buttons.
+**Action:** Always add `role="alert"` and `aria-live="assertive"` to error banners, and embed actionable CTAs within `.empty-state` overlays to guide the user naturally.
