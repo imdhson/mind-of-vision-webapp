@@ -84,6 +84,7 @@ export function CameraTab({ active }: { active: boolean }) {
           value={s.activeDeviceId}
           onChange={(e) => switchDevice(e.target.value)}
           disabled={!s.cameraDevices.length || s.modelStatus === 'loading'}
+          title={s.modelStatus === 'loading' ? 'AI 모델 로딩 중에는 카메라를 변경할 수 없습니다.' : '카메라 선택'}
         >
           <option value="">자동 카메라</option>
           {s.cameraDevices.map((d) => (
@@ -107,8 +108,26 @@ export function CameraTab({ active }: { active: boolean }) {
       <div className="camera-stage">
         <video ref={setVideoRef} muted playsInline autoPlay />
         <DetectionOverlay video={videoEl} />
-        {!s.cameraRunning && <div className="empty-state">카메라를 시작하면 객체 인식이 표시됩니다.</div>}
-        {!!error && <div className="error-banner">{error}</div>}
+        {!s.cameraRunning && (
+          <div className="empty-state">
+            <div className="panel-block">
+              <p>카메라를 시작하면 객체 인식이 표시됩니다.</p>
+              <button
+                className="primary"
+                onClick={() => start(s.activeDeviceId || undefined)}
+                disabled={s.modelStatus === 'loading'}
+                aria-busy={s.modelStatus === 'loading'}
+              >
+                {s.modelStatus === 'loading' ? '로딩 중…' : '카메라 시작하기'}
+              </button>
+            </div>
+          </div>
+        )}
+        {!!error && (
+          <div className="error-banner" role="alert" aria-live="assertive">
+            {error}
+          </div>
+        )}
       </div>
     </section>
   );
