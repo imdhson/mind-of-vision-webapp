@@ -15,7 +15,13 @@ export function DetectionOverlay({ video }: { video: HTMLVideoElement | null }) 
           height: `${(o.bbox.height / h) * 100}%`,
         };
         return (
-          <button key={o.id} className="bbox" style={s} onClick={() => onSelect(o.id)}>
+          <button
+            key={o.id}
+            className="bbox"
+            style={s}
+            onClick={() => onSelect(o.id)}
+            aria-label={`${o.label}, 거리 ${o.distanceM.toFixed(1)}미터, 선택하여 상세 정보 보기`}
+          >
             <span>
               {o.label} · {o.distanceM.toFixed(1)}m
             </span>

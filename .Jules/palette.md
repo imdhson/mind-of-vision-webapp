@@ -13,3 +13,6 @@
 ## 2026-10-06 - Empty State CTAs & Alert Accessibility
 **Learning:** Absolute-positioned error banners and empty states often fail to register with screen readers unless explicit ARIA attributes are used. Additionally, placing primary actions inside central empty state areas improves discoverability compared to small toolbar buttons.
 **Action:** Always add `role="alert"` and `aria-live="assertive"` to error banners, and embed actionable CTAs within `.empty-state` overlays to guide the user naturally.
+## 2024-10-07 - Accessible Custom Segments and Status Messages
+**Learning:** Custom segmented controls built with divs and buttons lack inherent structure for screen readers, meaning users can't identify the group context or their selected state. Status/error messages that appear dynamically (like calibration success) are visually clear but silently ignored by assistive technologies without ARIA live regions.
+**Action:** Always wrap custom segmented controls in `role="group"` with an `aria-label`, use `aria-pressed` on the individual buttons to denote active states, and ensure any dynamically rendered success/error text has `role="status" aria-live="polite"` so it is properly announced.
