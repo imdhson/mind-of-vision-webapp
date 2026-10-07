@@ -41,14 +41,26 @@ export function CalibrationPanel({ object, onApplied }: { object: SpatialObject;
   return (
     <div className="panel-block">
       <h3>보정값</h3>
-      <div className="segmented">
-        <button className={scope === 'temporary' ? 'active' : ''} onClick={() => setScope('temporary')}>
+      <div className="segmented" role="group" aria-label="보정 범위">
+        <button
+          className={scope === 'temporary' ? 'active' : ''}
+          aria-pressed={scope === 'temporary'}
+          onClick={() => setScope('temporary')}
+        >
           임시
         </button>
-        <button className={scope === 'object' ? 'active' : ''} onClick={() => setScope('object')}>
+        <button
+          className={scope === 'object' ? 'active' : ''}
+          aria-pressed={scope === 'object'}
+          onClick={() => setScope('object')}
+        >
           이 객체 저장
         </button>
-        <button className={scope === 'class' ? 'active' : ''} onClick={() => setScope('class')}>
+        <button
+          className={scope === 'class' ? 'active' : ''}
+          aria-pressed={scope === 'class'}
+          onClick={() => setScope('class')}
+        >
           모든 {object.label}
         </button>
       </div>
@@ -66,7 +78,11 @@ export function CalibrationPanel({ object, onApplied }: { object: SpatialObject;
       <button className="primary" onClick={apply}>
         저장 / 적용
       </button>
-      {message && <p className="hint">{message}</p>}
+      {message && (
+        <p className="hint" role="status" aria-live="polite">
+          {message}
+        </p>
+      )}
     </div>
   );
 }

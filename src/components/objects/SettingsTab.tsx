@@ -52,7 +52,12 @@ export function SettingsTab({ active }: { active: boolean }) {
           <div className="object-list">
             {snapshot.length ? (
               snapshot.map((o) => (
-                <button key={o.id} className={s.selectedId === o.id ? 'active' : ''} onClick={() => s.select(o.id)}>
+                <button
+                  key={o.id}
+                  className={s.selectedId === o.id ? 'active' : ''}
+                  aria-pressed={s.selectedId === o.id}
+                  onClick={() => s.select(o.id)}
+                >
                   <span>{o.label}</span>
                   <em>
                     {o.distanceM.toFixed(1)}m · {Math.round(o.score * 100)}%
