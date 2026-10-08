@@ -16,3 +16,7 @@
 ## 2024-10-07 - Accessible Custom Segments and Status Messages
 **Learning:** Custom segmented controls built with divs and buttons lack inherent structure for screen readers, meaning users can't identify the group context or their selected state. Status/error messages that appear dynamically (like calibration success) are visually clear but silently ignored by assistive technologies without ARIA live regions.
 **Action:** Always wrap custom segmented controls in `role="group"` with an `aria-label`, use `aria-pressed` on the individual buttons to denote active states, and ensure any dynamically rendered success/error text has `role="status" aria-live="polite"` so it is properly announced.
+
+## 2023-10-25 - Async Button UI States and A11y Forms
+**Learning:** React components dealing with IndexedDB (like the calibration saves) can take non-trivial time, so providing visual loading states on standard buttons with the disabled and aria-busy attributes improves confidence. Additionally, while the app visually associates spans inside labels, screen readers still need explicit `htmlFor` and `id` linking, particularly inside `.form-grid` layouts.
+**Action:** Always include loading states for any async IndexedDB interactions, disable buttons to prevent multi-clicks, and explicitly link labels to form inputs via `htmlFor` and `id`, even if wrapped in a semantic `<label>` container.
