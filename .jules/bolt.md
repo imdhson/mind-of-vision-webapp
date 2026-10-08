@@ -9,3 +9,7 @@
 ## 2024-10-07 - Decouple heavy calculations from fast R3F frame loops
 **Learning:** In `@react-three/fiber` applications, components often receive state updates at a slower frequency (e.g., a 14fps vision pipeline) but run `useFrame` callbacks at screen refresh rates (60Hz or higher). Performing array mappings or heavy math inside `useFrame` without memoization causes redundant work on identical data for multiple frames.
 **Action:** Extract math and iterations that depend only on React props/state out of the `useFrame` callback, and memoize them using `useMemo`. This allows the 60fps interpolation loop to run cleanly while the heavy calculations only run when the underlying data changes.
+
+## 2024-10-08 - Memoize heavy inner R3F elements in frequently updating groups
+**Learning:** In `@react-three/fiber`, frequently updating a parent `<group>`'s position or rotation (e.g., from a tracker) can cause costly fiber prop diffing and object recreation for complex inner children (like Drei's `<Text>` or dynamic geometries) if they are re-evaluated on every render.
+**Action:** Extract and memoize static or rarely-changing inner R3F elements using `useMemo`. Render the memoized content inside the frequently updating parent container to preserve high FPS and reduce GC pressure.
