@@ -17,6 +17,7 @@ export function CalibrationPanel({ object, onApplied }: { object: SpatialObject;
   const [scope, setScope] = useState<'temporary' | 'object' | 'class'>('temporary');
   const [values, setValues] = useState<CalibrationValues>({});
   const [message, setMessage] = useState('');
+  const [isApplying, setIsApplying] = useState(false);
   const [prevId, setPrevId] = useState(object.id);
   if (prevId !== object.id) {
     setPrevId(object.id);
@@ -28,6 +29,7 @@ export function CalibrationPanel({ object, onApplied }: { object: SpatialObject;
   }
   async function apply() {
     try {
+      setIsApplying(true);
       calibration.validate(values);
       if (scope === 'temporary') calibration.setTemp(object.id, values);
       else await calibration.save(scope, scope === 'object' ? object.id : object.className, object.className, values);
@@ -36,6 +38,8 @@ export function CalibrationPanel({ object, onApplied }: { object: SpatialObject;
     } catch (e) {
       console.error('Calibration apply error:', e);
       setMessage('보정값 적용 중 오류가 발생했습니다.');
+    } finally {
+      setIsApplying(false);
     }
   }
   return (
@@ -66,17 +70,23 @@ export function CalibrationPanel({ object, onApplied }: { object: SpatialObject;
       </div>
       <div className="form-grid">
         {fields.map(([k, l, u]) => (
-          <label key={k}>
+          <label key={k} htmlFor={`calib-${k}`}>
             <span>{l}</span>
             <div>
-              <input type="number" step="0.01" value={values[k] ?? ''} onChange={(e) => change(k, e.target.value)} />
+              <input
+                id={`calib-${k}`}
+                type="number"
+                step="0.01"
+                value={values[k] ?? ''}
+                onChange={(e) => change(k, e.target.value)}
+              />
               <em>{u}</em>
             </div>
           </label>
         ))}
       </div>
-      <button className="primary" onClick={apply}>
-        저장 / 적용
+      <button className="primary" onClick={apply} disabled={isApplying} aria-busy={isApplying}>
+        {isApplying ? '적용 중...' : '저장 / 적용'}
       </button>
       {message && (
         <p className="hint" role="status" aria-live="polite">

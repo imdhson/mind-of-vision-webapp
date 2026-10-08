@@ -3,6 +3,7 @@ import { useState } from 'react';
 export function SavedCalibrationManager() {
   const { calibration } = useRuntime();
   const [, redraw] = useState(0);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   return (
     <div className="panel-block">
       <h3>저장된 보정</h3>
@@ -17,14 +18,21 @@ export function SavedCalibrationManager() {
               </span>
               <button
                 aria-label={`${r.scope === 'class' ? '클래스' : '객체'} ${r.className} 보정 삭제`}
+                disabled={deletingId === r.id}
+                aria-busy={deletingId === r.id}
                 onClick={async () => {
                   if (window.confirm(`${r.className} 보정을 삭제하시겠습니까?`)) {
-                    await calibration.remove(r.id);
-                    redraw((x) => x + 1);
+                    setDeletingId(r.id);
+                    try {
+                      await calibration.remove(r.id);
+                      redraw((x) => x + 1);
+                    } finally {
+                      setDeletingId(null);
+                    }
                   }
                 }}
               >
-                삭제
+                {deletingId === r.id ? '삭제 중...' : '삭제'}
               </button>
             </div>
           ))}
