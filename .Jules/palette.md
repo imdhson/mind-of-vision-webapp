@@ -20,3 +20,7 @@
 ## 2023-10-25 - Async Button UI States and A11y Forms
 **Learning:** React components dealing with IndexedDB (like the calibration saves) can take non-trivial time, so providing visual loading states on standard buttons with the disabled and aria-busy attributes improves confidence. Additionally, while the app visually associates spans inside labels, screen readers still need explicit `htmlFor` and `id` linking, particularly inside `.form-grid` layouts.
 **Action:** Always include loading states for any async IndexedDB interactions, disable buttons to prevent multi-clicks, and explicitly link labels to form inputs via `htmlFor` and `id`, even if wrapped in a semantic `<label>` container.
+
+## 2026-10-09 - [Background Task Status and ARIA Live]
+**Learning:** [Users relying on assistive technology are unaware when background operations (like ML model loading) change states unless explicitly announced. Disabling inputs without context causes confusion.]
+**Action:** [Always use `role="status"` and `aria-live="polite"` on descriptive text elements associated with background operations, and ensure states map to human-readable (localized) text rather than raw developer strings.]

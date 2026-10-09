@@ -12,6 +12,7 @@ export function SettingsTab({ active }: { active: boolean }) {
       modelId: state.modelId,
       backend: state.backend,
       modelStatus: state.modelStatus,
+      message: state.message,
       select: state.select,
       setModelId: state.setModelId,
       setModelState: state.setModelState,
@@ -83,8 +84,16 @@ export function SettingsTab({ active }: { active: boolean }) {
               </option>
             ))}
           </select>
-          <p className="hint">
-            Backend: {s.backend} · {s.modelStatus}
+          <p className="hint" role="status" aria-live="polite">
+            Backend: {s.backend} ·{' '}
+            {s.message ||
+              (s.modelStatus === 'ready'
+                ? '준비됨'
+                : s.modelStatus === 'loading'
+                  ? '로딩 중'
+                  : s.modelStatus === 'error'
+                    ? '오류'
+                    : '대기 중')}
           </p>
         </div>
         <CameraSettings />
