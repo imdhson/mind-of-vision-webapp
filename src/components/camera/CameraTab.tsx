@@ -54,12 +54,14 @@ export function CameraTab({ active }: { active: boolean }) {
         calibration,
         onObjects: (objects) => useObjectStore.getState().setObjects(objects),
         onError: (e) => {
-          console.error('Pipeline error:', e);
+          // Security: Prevent stack trace leakage in logs
+          console.error('Pipeline error:', e instanceof Error ? e.message : 'Unknown error');
           useObjectStore.getState().setModelState({ message: '파이프라인 실행 중 오류가 발생했습니다.' });
         },
       });
     } catch (e) {
-      console.error('Camera start error:', e);
+      // Security: Prevent stack trace leakage in logs
+      console.error('Camera start error:', e instanceof Error ? e.message : 'Unknown error');
       setError('카메라 시작 중 오류가 발생했습니다.');
       s.setModelState({ modelStatus: 'error' });
     }

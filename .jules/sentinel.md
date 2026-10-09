@@ -7,3 +7,8 @@
 **Vulnerability:** The `index.html` lacked a `<meta http-equiv="Content-Security-Policy">` tag.
 **Learning:** Without a CSP, the application is more susceptible to Cross-Site Scripting (XSS) attacks, as any script or resource could theoretically be loaded and executed.
 **Prevention:** Implement a strict default CSP (e.g., `default-src 'self'`) and explicitly whitelist necessary external domains (like `https://storage.googleapis.com` for TFJS models) and allowed inline behaviors (`'unsafe-inline'` for React/Vite styles if necessary).
+
+## 2026-10-09 - Information Disclosure via Console Logs
+**Vulnerability:** Raw error objects (`e`) were being logged directly to `console.error` in catch blocks.
+**Learning:** Directly logging raw error objects can expose full stack traces and sensitive internal execution details to the browser console. This violates the "fail securely" principle.
+**Prevention:** When logging errors in catch blocks, extract and log only the relevant safe information, such as `e.message` if it is an `Error` object, to prevent leaking stack traces or internal mechanics.
