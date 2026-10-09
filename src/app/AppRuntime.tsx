@@ -25,7 +25,7 @@ export function AppRuntime({ children }: { children: ReactNode }) {
   const ctx = useMemo(() => makeContext(camera, pipeline, calibration), [camera, pipeline, calibration]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [profile, setProfile] = useState<CameraProfile>(defaultProfile());
-  const pitch = useDevicePitch();
+  const pitchRef = useDevicePitch();
   useWakeLock(true);
 
   useEffect(() => {
@@ -36,11 +36,19 @@ export function AppRuntime({ children }: { children: ReactNode }) {
     };
   }, [calibration, pipeline, camera]);
   useEffect(() => {
-    (window as any).__MOV_RUNTIME__ = { ...ctx, videoRef, profile, setProfile, pitch };
+    (window as any).__MOV_RUNTIME__ = {
+      ...ctx,
+      videoRef,
+      profile,
+      setProfile,
+      get pitch() {
+        return pitchRef.current;
+      },
+    };
     return () => {
       delete (window as any).__MOV_RUNTIME__;
     };
-  }, [ctx, profile, pitch]);
+  }, [ctx, profile, pitchRef]);
 
   useEffect(() => {
     const onDevice = async () => useObjectStore.getState().setCameraDevices(await camera.refreshDevices());
