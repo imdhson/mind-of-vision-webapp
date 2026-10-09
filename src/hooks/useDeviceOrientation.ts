@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 // ⚡ Bolt Performance Optimization:
 // Throttled the fast-firing deviceorientation event to 10Hz (100ms) and rounded
-// the pitch value to 1 decimal place. This significantly reduces top-level
-// React re-renders in AppRuntime while maintaining smooth orientation data.
+// the pitch value to 1 decimal place.
+// Changed from useState to useRef to prevent top-level React re-renders
+// in AppRuntime every 100ms, since this value is only polled by the vision pipeline.
 export function useDevicePitch() {
-  const [pitch, setPitch] = useState<number | undefined>();
+  const pitchRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     let lastUpdate = 0;
@@ -16,7 +17,7 @@ export function useDevicePitch() {
         if (now - lastUpdate > 100) {
           lastUpdate = now;
           const newPitch = Math.round((e.beta - 90) * 10) / 10;
-          setPitch(newPitch);
+          pitchRef.current = newPitch;
         }
       }
     };
@@ -25,5 +26,5 @@ export function useDevicePitch() {
     return () => window.removeEventListener('deviceorientation', handler, true);
   }, []);
 
-  return pitch;
+  return pitchRef;
 }

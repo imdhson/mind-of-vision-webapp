@@ -13,3 +13,7 @@
 ## 2024-10-08 - Memoize heavy inner R3F elements in frequently updating groups
 **Learning:** In `@react-three/fiber`, frequently updating a parent `<group>`'s position or rotation (e.g., from a tracker) can cause costly fiber prop diffing and object recreation for complex inner children (like Drei's `<Text>` or dynamic geometries) if they are re-evaluated on every render.
 **Action:** Extract and memoize static or rarely-changing inner R3F elements using `useMemo`. Render the memoized content inside the frequently updating parent container to preserve high FPS and reduce GC pressure.
+
+## 2024-10-09 - Use refs for continuously updating, non-reactive sensor data
+**Learning:** Storing fast-updating sensor data (like device orientation/pitch) in React state triggers a re-render of the component tree every time the value changes, even if the value is only polled periodically by an external process (like a 14fps vision pipeline).
+**Action:** Use `useRef` to store continuously updating data that does not need to instantly trigger a React render. The latest value can be accessed via `ref.current` by external consumers without paying the React rendering cost.
