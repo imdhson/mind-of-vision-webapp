@@ -38,7 +38,14 @@ export function ObjectDetailsSheet() {
 
   if (!o) return null;
   return (
-    <aside className="details-sheet" role="dialog" aria-labelledby="details-sheet-title" aria-modal="false" tabIndex={-1} ref={sheetRef}>
+    <aside
+      className="details-sheet"
+      role="dialog"
+      aria-labelledby="details-sheet-title"
+      aria-modal="false"
+      tabIndex={-1}
+      ref={sheetRef}
+    >
       <div className="sheet-head">
         <div>
           <strong id="details-sheet-title">{o.label}</strong>
