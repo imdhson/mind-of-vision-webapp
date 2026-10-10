@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useObjectStore } from '@/stores/objectStore';
 import { radToDeg } from '@/utils/math';
 import { CalibrationPanel } from '@/components/calibration/CalibrationPanel';
@@ -7,6 +7,25 @@ export function ObjectDetailsSheet() {
   const selectedId = useObjectStore((s) => s.selectedId);
   const o = useObjectStore((s) => (selectedId ? s.objects.find((x) => x.id === selectedId) : undefined));
   const select = useObjectStore((s) => s.select);
+
+  const sheetRef = useRef<HTMLElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+
+  // Use a stable boolean to represent open/closed state so we don't steal focus
+  // when the object's properties (like distance/confidence) update rapidly.
+  const isOpen = !!selectedId;
+
+  useEffect(() => {
+    if (isOpen) {
+      if (!triggerRef.current) {
+        triggerRef.current = document.activeElement as HTMLElement;
+      }
+      sheetRef.current?.focus();
+    } else if (triggerRef.current) {
+      triggerRef.current.focus();
+      triggerRef.current = null;
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (!o) return;
@@ -19,7 +38,7 @@ export function ObjectDetailsSheet() {
 
   if (!o) return null;
   return (
-    <aside className="details-sheet" role="dialog" aria-labelledby="details-sheet-title" aria-modal="false">
+    <aside className="details-sheet" role="dialog" aria-labelledby="details-sheet-title" aria-modal="false" tabIndex={-1} ref={sheetRef}>
       <div className="sheet-head">
         <div>
           <strong id="details-sheet-title">{o.label}</strong>
