@@ -17,3 +17,7 @@
 ## 2024-10-09 - Use refs for continuously updating, non-reactive sensor data
 **Learning:** Storing fast-updating sensor data (like device orientation/pitch) in React state triggers a re-render of the component tree every time the value changes, even if the value is only polled periodically by an external process (like a 14fps vision pipeline).
 **Action:** Use `useRef` to store continuously updating data that does not need to instantly trigger a React render. The latest value can be accessed via `ref.current` by external consumers without paying the React rendering cost.
+
+## 2024-10-10 - Hoist loop invariables in fast-running pipeline
+**Learning:** In a fast-running vision pipeline loop (e.g., up to 14fps), creating anonymous objects and invoking function getters inside an array map for every detected object causes redundant heap allocations and function executions on identical state.
+**Action:** Always hoist variables, context objects, and getter results that remain constant for a given frame execution outside of inner loops to minimize garbage collection pressure and CPU overhead.

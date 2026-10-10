@@ -35,15 +35,20 @@ export class VisionPipeline {
         const detections = await this.detector.detect(video);
         if (!this.running || generation !== this.generation) return;
         const tracks = this.tracker.update(detections);
-        const objects = tracks.map((t) =>
-          buildSpatialObject(t, {
-            width: video.videoWidth || 1280,
-            height: video.videoHeight || 720,
-            profile: args.profile(),
-            liveTiltDeg: args.liveTiltDeg(),
-            calibration: args.calibration,
-          }),
-        );
+
+        // ⚡ Bolt Performance Optimization:
+        // Hoist the context object creation and getter function calls
+        // outside of the array map loop to prevent redundant allocations
+        // and function executions for every detected track on every frame.
+        const ctx = {
+          width: video.videoWidth || 1280,
+          height: video.videoHeight || 720,
+          profile: args.profile(),
+          liveTiltDeg: args.liveTiltDeg(),
+          calibration: args.calibration,
+        };
+        const objects = tracks.map((t) => buildSpatialObject(t, ctx));
+
         args.onObjects(objects);
       } catch (e) {
         args.onError(e);
