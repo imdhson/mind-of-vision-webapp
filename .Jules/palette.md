@@ -24,3 +24,6 @@
 ## 2026-10-09 - [Background Task Status and ARIA Live]
 **Learning:** [Users relying on assistive technology are unaware when background operations (like ML model loading) change states unless explicitly announced. Disabling inputs without context causes confusion.]
 **Action:** [Always use `role="status"` and `aria-live="polite"` on descriptive text elements associated with background operations, and ensure states map to human-readable (localized) text rather than raw developer strings.]
+## 2026-10-10 - Dialog Focus Management
+**Learning:** Opening a floating sheet/dialog without programmatically shifting focus strands keyboard and screen-reader users, breaking accessibility.
+**Action:** Always save `document.activeElement` when opening a sheet, move focus to the sheet's wrapper (`tabIndex={-1}`), and restore focus to the original trigger when closed.
