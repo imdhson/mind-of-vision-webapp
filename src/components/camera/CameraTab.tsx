@@ -109,7 +109,7 @@ export function CameraTab({ active }: { active: boolean }) {
       </div>
       <div className="camera-stage">
         <video ref={setVideoRef} muted playsInline autoPlay />
-        <DetectionOverlay video={videoEl} />
+        <DetectionOverlay video={videoEl} active={active} />
         {!s.cameraRunning && (
           <div className="empty-state">
             <div className="panel-block">
