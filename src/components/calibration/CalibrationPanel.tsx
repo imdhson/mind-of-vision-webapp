@@ -44,7 +44,13 @@ export function CalibrationPanel({ object, onApplied }: { object: SpatialObject;
     }
   }
   return (
-    <form className="panel-block" onSubmit={(e) => { e.preventDefault(); apply(); }}>
+    <form
+      className="panel-block"
+      onSubmit={(e) => {
+        e.preventDefault();
+        apply();
+      }}
+    >
       <h3>보정값</h3>
       <div className="segmented" role="group" aria-label="보정 범위">
         <button
