@@ -44,10 +44,17 @@ export function CalibrationPanel({ object, onApplied }: { object: SpatialObject;
     }
   }
   return (
-    <div className="panel-block">
+    <form
+      className="panel-block"
+      onSubmit={(e) => {
+        e.preventDefault();
+        apply();
+      }}
+    >
       <h3>보정값</h3>
       <div className="segmented" role="group" aria-label="보정 범위">
         <button
+          type="button"
           className={scope === 'temporary' ? 'active' : ''}
           aria-pressed={scope === 'temporary'}
           onClick={() => setScope('temporary')}
@@ -55,6 +62,7 @@ export function CalibrationPanel({ object, onApplied }: { object: SpatialObject;
           임시
         </button>
         <button
+          type="button"
           className={scope === 'object' ? 'active' : ''}
           aria-pressed={scope === 'object'}
           onClick={() => setScope('object')}
@@ -62,6 +70,7 @@ export function CalibrationPanel({ object, onApplied }: { object: SpatialObject;
           이 객체 저장
         </button>
         <button
+          type="button"
           className={scope === 'class' ? 'active' : ''}
           aria-pressed={scope === 'class'}
           onClick={() => setScope('class')}
@@ -86,7 +95,7 @@ export function CalibrationPanel({ object, onApplied }: { object: SpatialObject;
           </label>
         ))}
       </div>
-      <button className="primary" onClick={apply} disabled={isApplying} aria-busy={isApplying}>
+      <button type="submit" className="primary" disabled={isApplying} aria-busy={isApplying}>
         {isApplying ? '적용 중...' : '저장 / 적용'}
       </button>
       {message && (
@@ -94,6 +103,6 @@ export function CalibrationPanel({ object, onApplied }: { object: SpatialObject;
           {message}
         </p>
       )}
-    </div>
+    </form>
   );
 }
