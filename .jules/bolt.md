@@ -21,3 +21,7 @@
 ## 2024-10-10 - Hoist loop invariables in fast-running pipeline
 **Learning:** In a fast-running vision pipeline loop (e.g., up to 14fps), creating anonymous objects and invoking function getters inside an array map for every detected object causes redundant heap allocations and function executions on identical state.
 **Action:** Always hoist variables, context objects, and getter results that remain constant for a given frame execution outside of inner loops to minimize garbage collection pressure and CPU overhead.
+
+## 2024-10-24 - Avoid Hidden DOM Reconciliation from Fast Data Stores
+**Learning:** When using global stores (like Zustand) that update frequently (e.g., a vision pipeline updating 14fps), components listening to the store will re-render even if they are in an inactive/hidden tab. This causes unnecessary React reconciliation and DOM diffing, consuming CPU cycles on the main thread for elements the user can't see.
+**Action:** Pass an `active` or `visible` prop to components that consume high-frequency store data. Within the component, use a conditional selector (e.g., returning a static empty array if inactive) so that the store updates bypass the component entirely when it is not active. This stops the reconciliation at the source.

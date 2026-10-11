@@ -1,8 +1,19 @@
 import { useObjectStore } from '@/stores/objectStore';
 
-export function DetectionOverlay({ video }: { video: HTMLVideoElement | null }) {
-  const objects = useObjectStore((s) => s.objects);
+import type { SpatialObject } from '@/types';
+
+const EMPTY_ARRAY: SpatialObject[] = [];
+
+export function DetectionOverlay({ video, active }: { video: HTMLVideoElement | null; active: boolean }) {
+  // ⚡ Bolt Performance Optimization:
+  // Conditional Zustand selector returns a static empty array when the tab is inactive.
+  // This completely bypasses React reconciliation for this DOM-heavy component,
+  // saving CPU cycles that would otherwise be wasted updating hidden DOM elements 14 times per second.
+  const objects = useObjectStore((s) => (active ? s.objects : EMPTY_ARRAY));
   const onSelect = useObjectStore((s) => s.select);
+
+  if (!active) return null;
+
   const w = video?.videoWidth || 1,
     h = video?.videoHeight || 1;
   return (
