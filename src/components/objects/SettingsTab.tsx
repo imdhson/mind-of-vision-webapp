@@ -78,6 +78,7 @@ export function SettingsTab({ active }: { active: boolean }) {
             value={s.modelId}
             onChange={(e) => model(e.target.value as ModelId)}
             disabled={s.modelStatus === 'loading'}
+            title={s.modelStatus === 'loading' ? '모델 로딩 중에는 변경할 수 없습니다.' : 'AI 모델 선택'}
           >
             {Object.entries(MODEL_REGISTRY).map(([id, m]) => (
               <option key={id} value={id}>

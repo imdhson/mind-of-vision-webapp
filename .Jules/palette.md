@@ -27,3 +27,7 @@
 ## 2026-10-10 - Dialog Focus Management
 **Learning:** Opening a floating sheet/dialog without programmatically shifting focus strands keyboard and screen-reader users, breaking accessibility.
 **Action:** Always save `document.activeElement` when opening a sheet, move focus to the sheet's wrapper (`tabIndex={-1}`), and restore focus to the original trigger when closed.
+
+## 2024-03-24 - Semantic Forms for Implicit Submission
+**Learning:** Custom input panels built with generic `<div>` containers require users to manually click submission buttons or use complex keyboard event listeners. By swapping generic containers for semantic `<form>` elements, we automatically gain implicit submission (pressing "Enter" inside inputs), significantly improving efficiency for power users and standard accessibility without extra code.
+**Action:** Always wrap logical groups of inputs and their action buttons in `<form>` tags, ensuring secondary buttons use `type="button"` to avoid accidental submission, while the primary action uses `type="submit"`.

@@ -1,0 +1,10 @@
+
+> mind-of-vision@1.0.0 dev /app
+> vite --host 0.0.0.0
+
+
+  VITE v8.3.2  ready in 356 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.0.2:5173/  eth0
+3:17:47 AM [vite] (client) [optimizer] bundling dependencies...
