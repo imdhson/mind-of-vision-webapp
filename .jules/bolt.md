@@ -25,3 +25,6 @@
 ## 2024-10-24 - Avoid Hidden DOM Reconciliation from Fast Data Stores
 **Learning:** When using global stores (like Zustand) that update frequently (e.g., a vision pipeline updating 14fps), components listening to the store will re-render even if they are in an inactive/hidden tab. This causes unnecessary React reconciliation and DOM diffing, consuming CPU cycles on the main thread for elements the user can't see.
 **Action:** Pass an `active` or `visible` prop to components that consume high-frequency store data. Within the component, use a conditional selector (e.g., returning a static empty array if inactive) so that the store updates bypass the component entirely when it is not active. This stops the reconciliation at the source.
+## 2025-02-05 - Bypass React Three Fiber Reconciliation for Hidden Tabs
+**Learning:** React Three Fiber components inside a hidden DOM element (e.g., inactive tab) continue to heavily execute reconciliation and waste CPU cycles when updating complex 3D meshes and Drei components driven by fast Zustand store updates (like a 14fps vision pipeline).
+**Action:** Use a conditional Zustand selector that returns a static reference (e.g. `EMPTY_ARRAY`) when the component's visibility/tab is inactive. This completely bypasses the costly R3F reconciliation loop.

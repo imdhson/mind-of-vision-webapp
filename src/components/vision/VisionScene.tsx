@@ -5,11 +5,18 @@ import { useShallow } from 'zustand/react/shallow';
 import { ObjectRenderer } from './ObjectRenderer';
 import { UserMarker } from './UserMarker';
 import { AutoCameraController } from './AutoCameraController';
+import type { SpatialObject } from '@/types';
 
-function ObjectsLayer() {
+const EMPTY_ARRAY: SpatialObject[] = [];
+
+function ObjectsLayer({ active }: { active: boolean }) {
   const { objects, selectedId, select } = useObjectStore(
     useShallow((state) => ({
-      objects: state.objects,
+      // ⚡ Bolt Performance Optimization:
+      // Conditional Zustand selector returns a static empty array when the tab is inactive.
+      // This completely bypasses React Three Fiber reconciliation for all 3D meshes,
+      // saving CPU cycles that would otherwise be wasted updating hidden objects 14 times per second.
+      objects: active ? state.objects : EMPTY_ARRAY,
       selectedId: state.selectedId,
       select: state.select,
     })),
@@ -20,7 +27,7 @@ function ObjectsLayer() {
       {objects.map((o) => (
         <ObjectRenderer key={o.id} object={o} selected={o.id === selectedId} onSelect={() => select(o.id)} />
       ))}
-      <AutoCameraController objects={objects} enabled={!selectedId} />
+      <AutoCameraController objects={objects} enabled={!selectedId && active} />
     </>
   );
 }
@@ -57,7 +64,7 @@ export function VisionScene({ active }: { active: boolean }) {
         </mesh>
       ))}
       <UserMarker />
-      <ObjectsLayer />
+      <ObjectsLayer active={active} />
       <OrbitControls
         enableDamping
         dampingFactor={0.05}
