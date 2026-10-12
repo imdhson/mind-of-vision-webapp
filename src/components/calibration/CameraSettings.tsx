@@ -22,8 +22,9 @@ export function CameraSettings() {
               type="number"
               value={p.fovDeg}
               onChange={(e) => patch('fovDeg', Number(e.target.value))}
+              aria-describedby="unit-cam-fov"
             />
-            <em>°</em>
+            <em id="unit-cam-fov">°</em>
           </div>
         </label>
         <label htmlFor="cam-height">
@@ -35,8 +36,9 @@ export function CameraSettings() {
               step="0.01"
               value={p.heightM}
               onChange={(e) => patch('heightM', Number(e.target.value))}
+              aria-describedby="unit-cam-height"
             />
-            <em>m</em>
+            <em id="unit-cam-height">m</em>
           </div>
         </label>
         <label htmlFor="cam-scale">
@@ -48,8 +50,9 @@ export function CameraSettings() {
               step="0.01"
               value={p.distanceScale}
               onChange={(e) => patch('distanceScale', Number(e.target.value))}
+              aria-describedby="unit-cam-scale"
             />
-            <em>x</em>
+            <em id="unit-cam-scale">x</em>
           </div>
         </label>
         <label htmlFor="cam-tilt">
@@ -61,8 +64,9 @@ export function CameraSettings() {
               step="0.1"
               value={p.tiltDeg}
               onChange={(e) => patch('tiltDeg', Number(e.target.value))}
+              aria-describedby="unit-cam-tilt"
             />
-            <em>°</em>
+            <em id="unit-cam-tilt">°</em>
           </div>
         </label>
       </div>

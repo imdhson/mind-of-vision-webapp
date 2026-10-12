@@ -31,3 +31,6 @@
 ## 2024-03-24 - Semantic Forms for Implicit Submission
 **Learning:** Custom input panels built with generic `<div>` containers require users to manually click submission buttons or use complex keyboard event listeners. By swapping generic containers for semantic `<form>` elements, we automatically gain implicit submission (pressing "Enter" inside inputs), significantly improving efficiency for power users and standard accessibility without extra code.
 **Action:** Always wrap logical groups of inputs and their action buttons in `<form>` tags, ensuring secondary buttons use `type="button"` to avoid accidental submission, while the primary action uses `type="submit"`.
+## 2024-05-15 - Input Units Accessibility
+**Learning:** Suffix units visually presented next to inputs (e.g., using `<em>` tags like "m" or "°") are often ignored by screen readers if they are not explicitly linked to the input field, leaving users confused about the expected format or unit of measurement.
+**Action:** Use `aria-describedby` on the `<input>` element and a matching `id` on the unit element to properly announce the unit suffix.

@@ -89,8 +89,10 @@ export function CalibrationPanel({ object, onApplied }: { object: SpatialObject;
                 step="0.01"
                 value={values[k] ?? ''}
                 onChange={(e) => change(k, e.target.value)}
+                placeholder="기본값"
+                aria-describedby={`unit-${k}`}
               />
-              <em>{u}</em>
+              <em id={`unit-${k}`}>{u}</em>
             </div>
           </label>
         ))}
