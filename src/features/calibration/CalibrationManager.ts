@@ -4,9 +4,13 @@ import { degToRad } from '@/utils/math';
 
 export class CalibrationManager {
   records: CalibrationRecord[] = [];
+  recordsMap = new Map<string, CalibrationRecord>();
   temp = new Map<string, CalibrationValues>();
   async init() {
     this.records = await listCalibrationRecords();
+    this.recordsMap.clear();
+    // Explicitly use scope:key to ensure lookup matches regardless of id format anomalies
+    this.records.forEach((r) => this.recordsMap.set(`${r.scope}:${r.key}`, r));
   }
   validate(v: CalibrationValues) {
     const checks: [keyof CalibrationValues, number, number][] = [
@@ -48,17 +52,23 @@ export class CalibrationManager {
     };
     await putCalibrationRecord(rec);
     this.records = this.records.filter((r) => r.id !== id).concat(rec);
+    if (old) {
+      this.recordsMap.delete(`${old.scope}:${old.key}`);
+    }
+    this.recordsMap.set(`${rec.scope}:${rec.key}`, rec);
   }
   async remove(id: string) {
+    const toRemove = this.records.find((r) => r.id === id);
     await deleteCalibrationRecord(id);
     this.records = this.records.filter((r) => r.id !== id);
+    if (toRemove) this.recordsMap.delete(`${toRemove.scope}:${toRemove.key}`);
   }
   resolve(objectId: string, className: string) {
     const temp = this.temp.get(objectId);
     if (temp) return { values: temp, source: 'temporary' as const };
-    const individual = this.records.find((r) => r.scope === 'object' && r.key === objectId);
+    const individual = this.recordsMap.get(`object:${objectId}`);
     if (individual) return { values: individual.values, source: 'object' as const };
-    const cls = this.records.find((r) => r.scope === 'class' && r.key === className);
+    const cls = this.recordsMap.get(`class:${className}`);
     if (cls) return { values: cls.values, source: 'class' as const };
     return { values: {} as CalibrationValues, source: undefined };
   }

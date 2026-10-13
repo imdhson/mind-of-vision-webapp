@@ -28,3 +28,7 @@
 ## 2025-02-05 - Bypass React Three Fiber Reconciliation for Hidden Tabs
 **Learning:** React Three Fiber components inside a hidden DOM element (e.g., inactive tab) continue to heavily execute reconciliation and waste CPU cycles when updating complex 3D meshes and Drei components driven by fast Zustand store updates (like a 14fps vision pipeline).
 **Action:** Use a conditional Zustand selector that returns a static reference (e.g. `EMPTY_ARRAY`) when the component's visibility/tab is inactive. This completely bypasses the costly R3F reconciliation loop.
+
+## 2026-10-13 - Replace O(N) array search with O(1) Map lookup
+**Learning:** Found an O(N) array scan (`Array.find`) inside the fast-executing `resolve()` method within `CalibrationManager.ts` that is called for every tracked object 14 times per second. As calibration records increase, this causes a measurable CPU overhead inside the vision tracking pipeline.
+**Action:** Changed the internal store to also maintain a Map (`recordsMap`) alongside the array. Updated the data access in `resolve()` to use O(1) `Map.get()` and synchronized the map across `init()`, `save()`, and `remove()`. Remember to avoid O(N) scans inside high-frequency processing paths by caching them into maps.
