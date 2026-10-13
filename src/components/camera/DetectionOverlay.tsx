@@ -30,7 +30,10 @@ export function DetectionOverlay({ video, active }: { video: HTMLVideoElement | 
             key={o.id}
             className="bbox"
             style={s}
-            onClick={() => onSelect(o.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelect(o.id);
+            }}
             aria-label={`${o.label}, 거리 ${o.distanceM.toFixed(1)}미터, 선택하여 상세 정보 보기`}
           >
             <span>
