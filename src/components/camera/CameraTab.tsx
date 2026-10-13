@@ -21,6 +21,7 @@ export function CameraTab({ active }: { active: boolean }) {
       modelId: state.modelId,
       modelStatus: state.modelStatus,
       setModelState: state.setModelState,
+      select: state.select,
       setActiveDeviceId: state.setActiveDeviceId,
       setCameraDevices: state.setCameraDevices,
       setCameraRunning: state.setCameraRunning,
@@ -107,7 +108,7 @@ export function CameraTab({ active }: { active: boolean }) {
           </button>
         )}
       </div>
-      <div className="camera-stage">
+      <div className="camera-stage" onClick={() => s.select(null)}>
         <video ref={setVideoRef} muted playsInline autoPlay />
         <DetectionOverlay video={videoEl} active={active} />
         {!s.cameraRunning && (

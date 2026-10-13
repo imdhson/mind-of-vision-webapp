@@ -34,3 +34,7 @@
 ## 2024-05-15 - Input Units Accessibility
 **Learning:** Suffix units visually presented next to inputs (e.g., using `<em>` tags like "m" or "°") are often ignored by screen readers if they are not explicitly linked to the input field, leaving users confused about the expected format or unit of measurement.
 **Action:** Use `aria-describedby` on the `<input>` element and a matching `id` on the unit element to properly announce the unit suffix.
+
+## 2024-10-13 - [Immersive View Selection Dismissal]
+**Learning:** [Users expect to be able to deselect an active object or dismiss an overlay by clicking anywhere on the background of the immersive camera view, similar to standard behavior in 3D views. Without this, they might get stuck with an overlay open.]
+**Action:** [Always ensure that immersive background views (like `.camera-stage`) have an `onClick` handler to clear the active selection, and make sure that interactive child elements (like `.bbox`) use `e.stopPropagation()` so they do not inadvertently trigger the background dismissal.]
