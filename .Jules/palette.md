@@ -38,3 +38,7 @@
 ## 2024-10-13 - [Immersive View Selection Dismissal]
 **Learning:** [Users expect to be able to deselect an active object or dismiss an overlay by clicking anywhere on the background of the immersive camera view, similar to standard behavior in 3D views. Without this, they might get stuck with an overlay open.]
 **Action:** [Always ensure that immersive background views (like `.camera-stage`) have an `onClick` handler to clear the active selection, and make sure that interactive child elements (like `.bbox`) use `e.stopPropagation()` so they do not inadvertently trigger the background dismissal.]
+
+## 2024-10-15 - [Cross-Tab Empty States]
+**Learning:** [When tabs rely on prerequisites from other tabs (like the 3D Vision tab requiring the camera to be active), displaying an empty or generic view can be confusing. Explicit empty states that explain the prerequisite and offer a CTA to resolve it directly guide the user without friction.]
+**Action:** [Always consider the cross-tab dependencies. If a view cannot function due to an action required elsewhere, implement an explicit `.empty-state` with a primary CTA button that navigates the user to the correct location or triggers the required action.]

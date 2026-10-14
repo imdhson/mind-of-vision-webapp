@@ -1,5 +1,10 @@
+import { useObjectStore } from '@/stores/objectStore';
 import { VisionScene } from './VisionScene';
+
 export function VisionTab({ active }: { active: boolean }) {
+  const cameraRunning = useObjectStore((s) => s.cameraRunning);
+  const setTab = useObjectStore((s) => s.setTab);
+
   return (
     <section className={`tab-page vision-page ${active ? 'show' : 'hide'}`} aria-hidden={!active}>
       <div className="thin-toolbar">
@@ -8,6 +13,16 @@ export function VisionTab({ active }: { active: boolean }) {
       </div>
       <div className="vision-stage">
         <VisionScene active={active} />
+        {!cameraRunning && (
+          <div className="empty-state">
+            <div className="panel-block">
+              <p>카메라가 중지되어 있습니다.</p>
+              <button className="primary" onClick={() => setTab('camera')}>
+                카메라 탭으로 이동
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
