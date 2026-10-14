@@ -7,14 +7,13 @@ export class ObjectTracker {
   constructor(private graceMs = 900) {}
 
   update(detections: RawDetection[], now = performance.now()): Track[] {
-    const existing = [...this.tracks.values()];
     const used = new Set<string>();
     const out: Track[] = [];
 
     for (const det of detections) {
       let best: Track | undefined;
       let bestScore = -Infinity;
-      for (const tr of existing) {
+      for (const tr of this.tracks.values()) {
         if (used.has(tr.id) || tr.className !== det.className) continue;
         const overlap = iou(tr.bbox, det.bbox);
         const dist = centerDistance(tr.bbox, det.bbox);
@@ -41,11 +40,12 @@ export class ObjectTracker {
         const id = `${det.className.replace(/\s+/g, '-')}-${this.seq++}`;
         const tr: Track = { ...det, id, createdAt: now, lastSeen: now, misses: 0, velocity: { x: 0, y: 0 } };
         this.tracks.set(id, tr);
+        used.add(id);
         out.push(tr);
       }
     }
 
-    for (const tr of existing) {
+    for (const tr of this.tracks.values()) {
       if (!used.has(tr.id) && now - tr.lastSeen <= this.graceMs) {
         tr.misses++;
         out.push(tr);
