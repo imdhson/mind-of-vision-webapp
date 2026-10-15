@@ -42,3 +42,7 @@
 ## 2024-10-15 - [Cross-Tab Empty States]
 **Learning:** [When tabs rely on prerequisites from other tabs (like the 3D Vision tab requiring the camera to be active), displaying an empty or generic view can be confusing. Explicit empty states that explain the prerequisite and offer a CTA to resolve it directly guide the user without friction.]
 **Action:** [Always consider the cross-tab dependencies. If a view cannot function due to an action required elsewhere, implement an explicit `.empty-state` with a primary CTA button that navigates the user to the correct location or triggers the required action.]
+
+## 2024-10-17 - Visual Scannability of Bottom Navigation
+**Learning:** [Plain text tabs in mobile bottom navigation lack visual anchors, making it harder for users to quickly scan and select sections without reading. Adding standard Unicode emojis as icons drastically improves scannability and UX while avoiding the payload overhead of external icon libraries.]
+**Action:** [Always include clear visual icons alongside text labels in main navigation components (like BottomTabs). When constraints prohibit new dependencies, use universally recognized Unicode emojis to provide lightweight visual polish.]
