@@ -42,3 +42,7 @@
 ## 2024-10-15 - [Cross-Tab Empty States]
 **Learning:** [When tabs rely on prerequisites from other tabs (like the 3D Vision tab requiring the camera to be active), displaying an empty or generic view can be confusing. Explicit empty states that explain the prerequisite and offer a CTA to resolve it directly guide the user without friction.]
 **Action:** [Always consider the cross-tab dependencies. If a view cannot function due to an action required elsewhere, implement an explicit `.empty-state` with a primary CTA button that navigates the user to the correct location or triggers the required action.]
+
+## 2026-10-16 - Accessible Emoji Icons
+**Learning:** Standard Unicode emojis are an effective, zero-dependency visual aid for navigation tabs. Wrapping them in `<span aria-hidden="true">`, while keeping the text label intact, avoids redundant screen reader announcements while enhancing the visual experience.
+**Action:** Use `<span aria-hidden="true">✨</span>` for decorative emojis across the app to reduce dependency sizes without compromising accessibility.
