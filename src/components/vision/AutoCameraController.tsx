@@ -8,7 +8,18 @@ import type { SpatialObject } from '@/types';
 // 60+ times per second in the useFrame loop. Instead, it recalculates
 // only when the `objects` array changes (max 14fps from the vision pipeline).
 export function AutoCameraController({ objects, enabled }: { objects: SpatialObject[]; enabled: boolean }) {
-  const far = useMemo(() => Math.max(5, ...objects.map((o) => Math.hypot(o.position.x, o.position.z))), [objects]);
+  // ⚡ Bolt Performance Optimization:
+  // Replaced O(N) array allocation (.map) and spread operator (...) with a standard for-loop.
+  // Impact: Reduces heap allocation and garbage collection pressure in a frequently
+  // updating memo block (up to 14fps). Also prevents potential call stack errors for large arrays.
+  const far = useMemo(() => {
+    let maxDist = 5;
+    for (let i = 0; i < objects.length; i++) {
+      const dist = Math.hypot(objects[i].position.x, objects[i].position.z);
+      if (dist > maxDist) maxDist = dist;
+    }
+    return maxDist;
+  }, [objects]);
 
   useFrame(({ camera }) => {
     if (!enabled) return;
