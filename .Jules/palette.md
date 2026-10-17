@@ -42,3 +42,7 @@
 ## 2024-10-15 - [Cross-Tab Empty States]
 **Learning:** [When tabs rely on prerequisites from other tabs (like the 3D Vision tab requiring the camera to be active), displaying an empty or generic view can be confusing. Explicit empty states that explain the prerequisite and offer a CTA to resolve it directly guide the user without friction.]
 **Action:** [Always consider the cross-tab dependencies. If a view cannot function due to an action required elsewhere, implement an explicit `.empty-state` with a primary CTA button that navigates the user to the correct location or triggers the required action.]
+
+## 2024-10-18 - [Emoji Visual Anchors]
+**Learning:** [When external icon libraries are prohibited to keep payloads small, tab navigation can become a wall of text that is hard to scan quickly. Adding standard Unicode emojis provides lightweight visual anchors that significantly improve scannability and delight without external dependencies.]
+**Action:** [Use standard Unicode emojis as lightweight icons in primary navigation components to improve scannability while adhering to strict dependency and custom CSS constraints.]
