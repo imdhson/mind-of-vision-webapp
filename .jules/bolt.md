@@ -36,3 +36,7 @@
 ## 2024-10-14 - Prevent array allocation from Maps in high-frequency loops
 **Learning:** In high-frequency execution paths (like a 14fps vision tracking pipeline), spreading a Map into an array (`[...map.values()]`) on every frame purely for iteration causes redundant heap allocations and creates measurable garbage collection pressure.
 **Action:** Always iterate Maps directly using `for (const val of map.values())` instead of spreading them into arrays. If new items are added to the Map during iteration that should not be processed in subsequent loops, manage their state using a `Set` (e.g., a `used` set) rather than relying on a static Array snapshot.
+
+## 2024-10-25 - Avoid Array map and Spread Syntax in fast-updating derived state
+**Learning:** Using `Math.max(...array.map())` creates intermediate array allocations and can hit call stack size limits if the array is large. Even when memoized, computing this on high-frequency state updates (like a vision pipeline updating at 14fps) adds unnecessary garbage collection pressure and CPU overhead.
+**Action:** Use standard `for` loops to iterate through arrays when computing aggregated values (like max/min) in fast-updating components to prevent intermediate array allocation and garbage collection churn.
