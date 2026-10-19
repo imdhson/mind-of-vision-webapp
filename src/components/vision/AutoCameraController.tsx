@@ -7,8 +7,17 @@ import type { SpatialObject } from '@/types';
 // This prevents running an array mapping and Math.hypot() calculation
 // 60+ times per second in the useFrame loop. Instead, it recalculates
 // only when the `objects` array changes (max 14fps from the vision pipeline).
+// Also replaced `Math.max(...objects.map())` with a standard for loop to prevent
+// intermediate array allocation and spread operator call stack issues.
 export function AutoCameraController({ objects, enabled }: { objects: SpatialObject[]; enabled: boolean }) {
-  const far = useMemo(() => Math.max(5, ...objects.map((o) => Math.hypot(o.position.x, o.position.z))), [objects]);
+  const far = useMemo(() => {
+    let maxDist = 5;
+    for (let i = 0; i < objects.length; i++) {
+      const dist = Math.hypot(objects[i].position.x, objects[i].position.z);
+      if (dist > maxDist) maxDist = dist;
+    }
+    return maxDist;
+  }, [objects]);
 
   useFrame(({ camera }) => {
     if (!enabled) return;
