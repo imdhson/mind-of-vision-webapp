@@ -32,6 +32,9 @@ importers:
       three:
         specifier: ^0.186.0
         version: 0.186.1
+      workbox-window:
+        specifier: ^7.4.1
+        version: 7.4.1
       zustand:
         specifier: ^5.0.8
         version: 5.0.15(@types/react@19.3.0)(react@19.3.0)(use-sync-external-store@1.7.0(react@19.3.0))

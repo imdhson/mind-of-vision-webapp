@@ -16,7 +16,10 @@ export function BottomTabs() {
           onClick={() => setTab(id)}
           aria-current={tab === id ? 'page' : undefined}
         >
-          <span aria-hidden="true" style={{ marginRight: '4px' }}>{icon}</span> {label}
+          <span aria-hidden="true" style={{ marginRight: '4px' }}>
+            {icon}
+          </span>{' '}
+          {label}
         </button>
       ))}
     </nav>
