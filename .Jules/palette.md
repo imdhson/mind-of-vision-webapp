@@ -42,3 +42,6 @@
 ## 2024-10-15 - [Cross-Tab Empty States]
 **Learning:** [When tabs rely on prerequisites from other tabs (like the 3D Vision tab requiring the camera to be active), displaying an empty or generic view can be confusing. Explicit empty states that explain the prerequisite and offer a CTA to resolve it directly guide the user without friction.]
 **Action:** [Always consider the cross-tab dependencies. If a view cannot function due to an action required elsewhere, implement an explicit `.empty-state` with a primary CTA button that navigates the user to the correct location or triggers the required action.]
+## 2024-05-24 - Accessible Unicode Emojis as Visual Anchors
+**Learning:** Unicode emojis are lightweight visual anchors that keep payloads small but can be overly verbose for screen reader users (e.g., 'camera with flash').
+**Action:** Always wrap standard Unicode emojis in `<span aria-hidden="true">`, particularly in UI components like navigation tabs, to prevent screen readers from announcing verbose descriptions alongside the intended label.
